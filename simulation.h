@@ -1,25 +1,20 @@
 #pragma once
 
-#define CELL_SIZE 64
+#define VIEW_FACTOR 2
+#define CELL_SIZE 64*VIEW_FACTOR
 #define MAZECOLS 10
 #define MAZEROWS 10
 
-#define SCREEN_WIDTH (MAZECOLS * CELL_SIZE)
-#define SCREEN_HEIGHT (MAZECOLS * CELL_SIZE)
+#define SCREEN_WIDTH (MAZECOLS * CELL_SIZE / VIEW_FACTOR)
+#define SCREEN_HEIGHT (MAZECOLS * CELL_SIZE / VIEW_FACTOR)
 
 #define COIN_SIZE (CELL_SIZE / 2)
 #define COIN_SCORE 10
-
-#define TIME_SIZE (COIN_SIZE)
-#define TIME_INCREASE 100
 
 #define SPEED 2
 #define LEVELS 4
 
 #define MONSTERS 4
-#define MONSTERS_DIR_CHANGE 30
-#define MONSTER_SIZE 131
-#define MONSTER_DELAY 8
 
 #define SEPARATOR '|'
 #define FREEZE_LIMIT 20
@@ -57,7 +52,7 @@ public:
     void encode(int x[]);
     void decode(int y[]);
 
-	void draw(SDL_Renderer *renderer, TTF_Font *font);
+	void draw(SDL_Renderer *renderer, TTF_Font *font, int * viewPort);
 	void dispName(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos);
 	void dispScore(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos);
 	void dispTime(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos);
@@ -110,6 +105,10 @@ public:
 	void render();
 	void levelStart(int level);
 	void levelEnd();
+
+	void updateVisibility();
+	void updatePlayerVisibility(Player &p);
+	int viewPort[2];
 
 	SDL_Renderer *renderer;
 	TTF_Font *font;

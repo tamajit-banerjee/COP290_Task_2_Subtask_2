@@ -38,6 +38,11 @@ int main(){
     Simulation *simulation = new Simulation();
     simulation->init(renderer, font);
 
+    SDL_Rect viewPort;
+    viewPort.h = SCREEN_HEIGHT; viewPort.w = SCREEN_WIDTH;
+    viewPort.x = 0; viewPort.y = 0;
+    SDL_RenderSetViewport(renderer, &viewPort);
+
     char name[100];
     for(int i = 0; i<100; i++){name[i] = ' ';}
     simulation->sPlayer.name = name;

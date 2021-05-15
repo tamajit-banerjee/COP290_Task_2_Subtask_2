@@ -27,10 +27,16 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
 
     cPlayer.playerId = 4;
     cPlayer.player_no = 2;
+
+    viewPort[0] = 0; viewPort[1] = 0; 
 }
 
 void Simulation::levelStart(int arg_level){
     level = arg_level;
+
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderPresent(renderer);
 
     counter = 0;
     mazeInit();
@@ -51,13 +57,7 @@ void Simulation::levelStart(int arg_level){
 
     isLevelRunning = true;
     
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    disp_text(renderer, "Level: ", font, 290, 220);
-    std::string temp_str = std::to_string(level);
-    char* char_type = (char*) temp_str.c_str();
-    disp_text(renderer, char_type, font, 340, 220);
-    SDL_RenderPresent(renderer);
+    
 
 }
 
@@ -131,6 +131,7 @@ void Simulation::update(){
     else    
         cPlayer.final_freeze = true;
 
+    updateVisibility();
     // std::this_thread::sleep_for(std::chrono::milliseconds(50));
     
 }
@@ -140,7 +141,9 @@ void Simulation::render(){
 
     renderMaze();
 
-    sPlayer.draw(renderer, font);
+    sPlayer.draw(renderer, font, viewPort);
+    
+    // SDL_RenderSetViewport(renderer, &viewPort);
 
     SDL_RenderPresent(renderer);
 }
