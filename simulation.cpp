@@ -11,6 +11,9 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     loadTexture("player", "resources/players_combined.bmp");
     loadTexture("maze", "resources/maze.bmp");
     loadTexture("coin", "resources/coins.bmp");
+    
+    loadTexture("forward_line", "resources/forward_line.bmp");
+    loadTexture("back_line", "resources/back_line.bmp");
 
     droid.playerId = 1;
     droid.player_no = 1;
@@ -29,6 +32,10 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     int random_j = std::rand() % int(MAZECOLS/3);
     
     droid.setPosCenter(random_i, random_j);
+    // droid.setPosCenter(1, 1);
+    droid.dest = (MAZEROWS)*(MAZECOLS);
+
+    maze_dist_update();
 }
 
 void Simulation::handleEvents()
@@ -45,10 +52,10 @@ void Simulation::handleEvents()
         if(event.key.keysym.sym == SDLK_ESCAPE)
             isRunning = false;
         else
-            droid.handleKeyDown(event.key.keysym.sym);
+            // droid.handleKeyDown(event.key.keysym.sym);
         break;
     case SDL_KEYUP:
-        droid.handleKeyUp(event.key.keysym.sym);
+        // droid.handleKeyUp(event.key.keysym.sym);
 	default:
 		break;
 	}
@@ -58,15 +65,17 @@ void Simulation::update(){
 
     simulationTime++;
 
-    std::pair<int, int> s_p = droid.move(SPEED); 
-    if(!checkWallCollisions(s_p.first, s_p.second, droid.width, droid.height)){
-        droid.xpos = s_p.first; droid.ypos = s_p.second;
+    // std::pair<int, int> s_p = droid.move(SPEED); 
+    // if(!checkWallCollisions(s_p.first, s_p.second, droid.width, droid.height)){
+    //     droid.xpos = s_p.first; droid.ypos = s_p.second;
+    // }
+    if(centre()){
+        addLines();
     }
 
+    updateDroid();
     checkCoinTimeEat();
-    
     updateVisibility();
-
     // std::this_thread::sleep_for(std::chrono::milliseconds(50));
     
 }
@@ -78,7 +87,11 @@ void Simulation::render(){
 
     renderMaze();
 
+    drawLines();
+
     droid.draw(renderer, font);
+
+    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
 
     SDL_RenderPresent(renderer);
 }
@@ -101,6 +114,16 @@ void Simulation::loadTexture(char *textName, char *path){
     else if(strcmp(textName, "coin") == 0){
         tmpSurface = SDL_LoadBMP(path);
         coinTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+        SDL_FreeSurface(tmpSurface);
+    }
+    else if(strcmp(textName, "forward_line") == 0){
+        tmpSurface = SDL_LoadBMP(path);
+        forwardTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+        SDL_FreeSurface(tmpSurface);
+    }
+    else if(strcmp(textName, "back_line") == 0){
+        tmpSurface = SDL_LoadBMP(path);
+        backTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
         SDL_FreeSurface(tmpSurface);
     }
 }

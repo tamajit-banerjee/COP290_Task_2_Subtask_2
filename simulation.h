@@ -29,6 +29,7 @@ public:
 
 	Player();
 	Player(const Player &p);
+	int dest;
 
     void encode(int x[]);
     void decode(int y[]);
@@ -42,22 +43,10 @@ public:
 	void handleKeyDown(int key);
 	void handleKeyUp(int key);
 	std::pair<int, int> getMazeCoordinates(SDL_Rect & r);
-};
+	int changeDirCounter;
 
-class Monster{
-public:
-	int xpos, ypos;
-	int old_xpos, old_ypos;
-	int id;
-	int right, left, up, down;
-	int width, height;
-	int renderCycle;
-
-	SDL_Texture *Tex;
-
-	int changeDirectionCounter;
-
-	Monster(){}
+	bool isBackTracking;
+	int last_i, last_j;
 };
 
 class MazeCell{
@@ -66,6 +55,7 @@ public:
 	bool hastime;
 	bool explored;
 	int explorationCounter;
+	int to_go[MAZECOLS*MAZEROWS];
 	void incrementExplored();
 	void resetCounter();
 	int id; 
@@ -118,9 +108,19 @@ public:
 	void updateCoinTime(Player & p, MazeCell & m);
 	
 	void loadTexture(char *textName, char *path);
+	void maze_dist_update();
+	bool centre();
+	void updateDroid();
 
 	Simulation(){}
 	~Simulation(){}
 
 	int simulationTime;
+
+	void addLines();
+	void drawLines();
+	std::vector<SDL_Rect> linesForward;
+	std::vector<SDL_Rect> linesBacktrack;
+	SDL_Texture *forwardTex;
+	SDL_Texture *backTex;
 };

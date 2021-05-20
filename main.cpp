@@ -41,13 +41,14 @@ int main(){
     char name[100];
     for(int i = 0; i<100; i++){name[i] = ' ';}
     simulation->droid.name = name;
-    simulation->init(renderer, font);
 
     while (simulation->running()) {
-        
+         
         simulation->handleEvents();
         simulation->update();
         simulation->render();
+
+       
 
         if(simulation->droid.time<=0){
             simulation->isRunning = false;

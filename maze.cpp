@@ -232,7 +232,7 @@ void Simulation::renderMaze(){
             }
             if(maze[i][j].explorationCounter >= 100*MEMORY){
                 maze[i][j].resetCounter();
-                maze[i][j].explored = false;
+                // maze[i][j].explored = false;
                 continue;
             }
             maze[i][j].explorationCounter ++ ;
@@ -303,8 +303,85 @@ bool iscollidingwall(int x, int y, int w, int h, SDL_Rect maze_rect){
         return false;
 
     return true;
-    
 }
+
+void Simulation::maze_dist_update(){
+
+        //std::pair<int,int> dir[] = {std::make_pair(1,0),std::make_pair(-1,0),std::make_pair(0,1),std::make_pair(0,-1)};
+
+        for(int i =0; i<MAZEROWS; i++){
+        for(int j = 0; j<MAZECOLS; j++){
+            //do bfs 
+            std::queue<int> q;
+            std::vector<bool> used(MAZECOLS*MAZEROWS);
+            std::vector<int> d(MAZECOLS*MAZEROWS), p(MAZECOLS*MAZEROWS);
+
+            int s = i*MAZECOLS+j;
+
+            q.push(s);
+            used[s] = true;
+            p[s] = -1;
+            d[s] = 0;
+            
+            while (!q.empty()) {
+
+                int v = q.front();
+                q.pop();
+
+                int row = v/MAZECOLS;
+                int col = v%MAZECOLS;
+                int id = maze[row][col].id;
+                if((id>>0)%2 == 0){
+                    int u = (row)*MAZECOLS + col - 1;
+                    if (!used[u]) {
+                        used[u] = true;
+                        q.push(u);
+                        d[u] = d[v] + 1;
+                        p[u] = v;
+                        maze[row][col-1].to_go[s] = 1;
+                    }
+                }
+
+                if((id>>1)%2 == 0){
+                    int u = (row)*MAZECOLS + col + 1;
+                    if (!used[u]) {
+                        used[u] = true;
+                        q.push(u);
+                        d[u] = d[v] + 1;
+                        p[u] = v;
+                        maze[row][col+1].to_go[s] = 0;
+                    }
+                }
+
+                if((id>>2)%2 == 0){
+                    int u = (row-1)*MAZECOLS + col;
+                    if (!used[u]) {
+                        used[u] = true;
+                        q.push(u);
+                        d[u] = d[v] + 1;
+                        p[u] = v;
+                        maze[row-1][col].to_go[s] = 3;
+                    }
+                }
+
+                if((id>>3)%2 == 0){
+                    int u = (row+1)*MAZECOLS + col;
+                    if (!used[u]) {
+                        used[u] = true;
+                        q.push(u);
+                        d[u] = d[v] + 1;
+                        p[u] = v;
+                        maze[row+1][col].to_go[s] = 2;
+                    }
+                }
+            }
+
+        }
+    }
+
+}
+
+
 
 int pow(int x, int y){
     if(y <= 0)
@@ -312,6 +389,7 @@ int pow(int x, int y){
     else    
         return x * pow(x, y-1);
 }
+
 
 bool Simulation::checkWallCollisions(int x, int y, int w, int h){
     for(int i =0; i<MAZEROWS; i++){

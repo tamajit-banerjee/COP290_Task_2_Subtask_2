@@ -29,5 +29,7 @@
 #define FREEZE_LIMIT 20
 #define WALL_RATIO 8
 
+#define CHANGE_DIR_TIME 10
+
 
 #endif

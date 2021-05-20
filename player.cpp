@@ -15,6 +15,9 @@ Player::Player(){
     playerId = 1;
     renderCycle = 1;
     player_no = 1;
+    changeDirCounter = 0;
+    last_i = -1; last_j = -1;
+    isBackTracking = false;
 }
 
 
@@ -103,7 +106,7 @@ void Player::dispTime(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos
 std::pair<int,int> Player::move(int s){
     old_xpos = xpos, old_ypos = ypos;
     int new_x = xpos, new_y = ypos;
-    // std::cout<<xpos<<" "<<right<<'\n';
+    // std::cout<<xpos<<" "<<left<<'\n';
     if(right)
         new_x+=s;
     if(left)
@@ -168,4 +171,124 @@ std::pair<int, int> Player::getMazeCoordinates(SDL_Rect &r){
     return std::make_pair(-1, -1);
 }
 
+bool Simulation::centre(){
+    int x = droid.xpos + droid.width/2 - CELL_SIZE/2;
+    int y = droid.ypos + droid.height/2 - CELL_SIZE/2;
+    return ((x%CELL_SIZE == 0) && (y%CELL_SIZE == 0));
+}
 
+int distSquare(int ran, std::pair<int, int> i_j){
+    int x1 = i_j.first; 
+    int y1 = i_j.second;
+    int x2 = ran / MAZECOLS;
+    int y2 = ran % MAZECOLS;
+
+    return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
+}
+
+void Simulation::updateDroid(){    
+    std::pair<int, int> i_j = droid.getMazeCoordinates(maze[0][0].dstR);
+    if(centre()){
+        if(droid.changeDirCounter <= 0){
+            if(rand()%10 < 2)
+                droid.changeDirCounter = 0 ;
+            else 
+                droid.changeDirCounter = CHANGE_DIR_TIME;
+            
+            
+            srand(simulationTime);
+            droid.dest =  rand()%(MAZECOLS * MAZEROWS);
+            while (distSquare(droid.dest, i_j) < 48 && maze[droid.dest/MAZECOLS][droid.dest%MAZECOLS].explored)
+                droid.dest =  rand()%(MAZECOLS * MAZEROWS);
+        }
+        else{
+            droid.changeDirCounter -- ;
+        }
+        droid.left = 0;
+        droid.right = 0;
+        droid.up = 0;
+        droid.down = 0;
+        int direction = maze[i_j.first][i_j.second].to_go[droid.dest];
+        switch(direction){
+            case 0:
+                droid.left = 1; break;
+            case 1:
+                droid.right = 1; break;
+            case 2:
+                droid.up = 1; break;
+            case 3:
+                droid.down = 1; break;
+        }
+    }
+    std::pair<int, int> s_p = droid.move(SPEED);
+    droid.xpos = s_p.first;
+    droid.ypos = s_p.second;
+}
+
+void makeRect(int x1, int y1, int x2, int y2, SDL_Rect * rect, int type){
+    int width = 5;
+    int offset = -10*(2*type - 1);
+    // int offset = 0;
+
+
+    if(x1 == x2){
+        rect->w = width;
+        rect->h = abs(y2 - y1);
+        rect->x = x1 + offset;
+        if(y1>y2)
+            rect->y = y2 + offset;
+        else
+            rect->y = y1 + offset;
+    }
+    if(y1 == y2){
+        rect->h = width;
+        rect->w = abs(x2 - x1);
+        rect->y = y1 + offset;
+        if(x1>x2)
+            rect->x = x2 + offset;
+        else
+            rect->x = x1 + offset;
+    }
+    rect->x += PADDING_LEFT;
+    rect->y += PADDING_TOP;
+    
+}
+
+void Simulation::addLines(){
+    std::pair<int, int> i_j = droid.getMazeCoordinates(maze[0][0].dstR);
+
+    if(droid.last_j != -1 && droid.last_i !=-1){
+        SDL_Rect rect;
+        // if(droid.isBackTracking){
+            makeRect(CELL_SIZE/2 + CELL_SIZE * i_j.second, CELL_SIZE/2 + CELL_SIZE * i_j.first, CELL_SIZE/2 + CELL_SIZE * droid.last_j, CELL_SIZE/2 + CELL_SIZE * droid.last_i, &rect, 1);
+            linesBacktrack.push_back(rect);
+        // }
+        // else{
+            makeRect(CELL_SIZE/2 + CELL_SIZE * i_j.second, CELL_SIZE/2 + CELL_SIZE * i_j.first, CELL_SIZE/2 + CELL_SIZE * droid.last_j, CELL_SIZE/2 + CELL_SIZE * droid.last_i, &rect, 0);
+            linesForward.push_back(rect);
+        // }
+    }
+
+    droid.last_i = i_j.first;
+    droid.last_j = i_j.second;
+
+}
+
+void Simulation::drawLines(){
+    SDL_SetRenderDrawColor(renderer, 50, 255, 50, 255);
+    for(int i = 0; i < linesForward.size(); i++){
+        if(SDL_RenderCopyEx(renderer, forwardTex,  NULL, &linesForward[i], 0.0, NULL, SDL_FLIP_NONE) < 0){
+            std::cout<<"Forward lines not rendered properly\n";
+            std::cout<<SDL_GetError()<<"\n";
+            exit(EXIT_FAILURE);
+        }
+    }
+    SDL_SetRenderDrawColor(renderer, 255, 50, 50, 255);
+    for(int i = 0; i < linesBacktrack.size(); i++){
+        if(SDL_RenderCopyEx(renderer, backTex,  NULL, &linesBacktrack[i], 0.0, NULL, SDL_FLIP_NONE) < 0){
+            std::cout<<"BackTracking lines not rendered properly\n";
+            std::cout<<SDL_GetError()<<"\n";
+            exit(EXIT_FAILURE);
+        }
+    }
+}
