@@ -189,26 +189,30 @@ int distSquare(int ran, std::pair<int, int> i_j){
 void Simulation::updateDroid(){    
     std::pair<int, int> i_j = droid.getMazeCoordinates(maze[0][0].dstR);
     if(centre()){
-        if(droid.changeDirCounter <= 0){
-            if(rand()%10 < 2)
-                droid.changeDirCounter = 0 ;
-            else 
-                droid.changeDirCounter = CHANGE_DIR_TIME;
+        
+        // if(droid.changeDirCounter <= 0){
+        //     if(rand()%10 < 2)
+        //         droid.changeDirCounter = 0 ;
+        //     else 
+        //         droid.changeDirCounter = CHANGE_DIR_TIME;
             
             
-            srand(simulationTime);
-            droid.dest =  rand()%(MAZECOLS * MAZEROWS);
-            while (distSquare(droid.dest, i_j) < 48 && maze[droid.dest/MAZECOLS][droid.dest%MAZECOLS].explored)
-                droid.dest =  rand()%(MAZECOLS * MAZEROWS);
-        }
-        else{
-            droid.changeDirCounter -- ;
-        }
+        //     srand(simulationTime);
+        //     droid.dest =  rand()%(MAZECOLS * MAZEROWS);
+        //     while (distSquare(droid.dest, i_j) < 48 && maze[droid.dest/MAZECOLS][droid.dest%MAZECOLS].explored)
+        //         droid.dest =  rand()%(MAZECOLS * MAZEROWS);
+        // }
+        // else{
+        //     droid.changeDirCounter -- ;
+        // }
+
+
         droid.left = 0;
         droid.right = 0;
         droid.up = 0;
         droid.down = 0;
         int direction = maze[i_j.first][i_j.second].to_go[droid.dest];
+
         switch(direction){
             case 0:
                 droid.left = 1; break;
@@ -219,10 +223,13 @@ void Simulation::updateDroid(){
             case 3:
                 droid.down = 1; break;
         }
+
     }
+    
     std::pair<int, int> s_p = droid.move(SPEED);
     droid.xpos = s_p.first;
     droid.ypos = s_p.second;
+
 }
 
 void makeRect(int x1, int y1, int x2, int y2, SDL_Rect * rect, int type){
