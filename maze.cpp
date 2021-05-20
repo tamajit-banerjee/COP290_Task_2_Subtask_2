@@ -148,14 +148,7 @@ bool Simulation::union_sets(int a, int b) {
 }
 
 void Simulation:: maze_gen(){
-    
-//    srand(1);
-//
-//    int x = std::rand()%10;
-//    int y = std::rand()%10;
-//
-//    dfs(x,y);
-//
+
     std::pair<int,int> dir[] = {std::make_pair(1,0),std::make_pair(-1,0),std::make_pair(0,1),std::make_pair(0,-1)};
     std::vector<std::pair<std::pair<int,int>,std::pair<int,int> > > store;
 
@@ -210,17 +203,14 @@ void Simulation:: maze_gen(){
                 default:
                     break;
             }
-            // SDL_RenderClear(renderer);
-            // renderMaze();
-            // std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            // coinCycle+=4;
-            // timeCycle+=4;
-            // SDL_RenderPresent(renderer);
         }
     }
 }
 
 
+void MazeCell::resetCounter(){
+    explorationCounter = 0;
+}
 
 
 void Simulation::renderMaze(){
@@ -231,14 +221,26 @@ void Simulation::renderMaze(){
     for(int i =0; i<MAZEROWS; i++){
         for(int j = 0; j<MAZECOLS; j++){
             
+
             maze[i][j].dstR.w = cell_width;
             maze[i][j].dstR.h = cell_height;
             maze[i][j].dstR.x = maze[i][j].dstR.w * j;
             maze[i][j].dstR.y = maze[i][j].dstR.h * i;
+
+            if(!maze[i][j].explored){
+                continue;
+            }
+            if(maze[i][j].explorationCounter >= 100*MEMORY){
+                maze[i][j].resetCounter();
+                maze[i][j].explored = false;
+                continue;
+            }
+            maze[i][j].explorationCounter ++ ;
+
             SDL_Rect mazedstR;
             mazedstR.w = maze[i][j].dstR.w; mazedstR.h = maze[i][j].dstR.h;
-            mazedstR.x = maze[i][j].dstR.x - viewPort[0];
-            mazedstR.y = maze[i][j].dstR.y - viewPort[1];
+            mazedstR.x = maze[i][j].dstR.x + PADDING_LEFT;
+            mazedstR.y = maze[i][j].dstR.y + PADDING_TOP;
             if(SDL_RenderCopyEx(renderer, mazeTex,  &maze[i][j].srcR, &mazedstR, 0.0, NULL, SDL_FLIP_NONE) < 0){
                 std::cout<<"Maze cell"<<i<<", "<<j<<" not rendered properly\n";
                 std::cout<<SDL_GetError()<<"\n";
@@ -253,8 +255,8 @@ void Simulation::renderMaze(){
 
             dstR.w = coin_width;
             dstR.h = coin_height;
-            dstR.x = cell_width * j + (cell_width - coin_width)/2 - viewPort[0];
-            dstR.y = cell_height * i + (cell_height - coin_height)/2 - viewPort[1];
+            dstR.x = cell_width * j + (cell_width - coin_width)/2 + PADDING_LEFT;
+            dstR.y = cell_height * i + (cell_height - coin_height)/2 + PADDING_TOP;
             
             if(maze[i][j].hascoin){
                 if(SDL_RenderCopyEx(renderer, coinTex,  &srcR, &dstR, 0.0, NULL, SDL_FLIP_NONE) < 0){
@@ -284,6 +286,8 @@ void Simulation::mazeInit(){
             maze[i][j].update(15);
             maze[i][j].hascoin = false;
             maze[i][j].hastime = false;
+            maze[i][j].explored = false;
+            maze[i][j].resetCounter();
         }
     }
     coinCycle = 0;
@@ -394,26 +398,27 @@ void Simulation::updateCoinTime(Player & p, MazeCell & m){
     }
 }
 void Simulation::checkCoinTimeEat(){
-    std::pair<int, int> s_co = sPlayer.getMazeCoordinates(maze[0][0].dstR);
-    std::pair<int, int> c_co = cPlayer.getMazeCoordinates(maze[0][0].dstR);
-    
-    updateCoinTime(sPlayer, maze[s_co.first][s_co.second]);
-    updateCoinTime(cPlayer, maze[c_co.first][c_co.second]);
-
+    std::pair<int, int> s_co = droid.getMazeCoordinates(maze[0][0].dstR);
+    updateCoinTime(droid, maze[s_co.first][s_co.second]);
+    updateCoinTime(droid, maze[s_co.first + 1][s_co.second]);
+    updateCoinTime(droid, maze[s_co.first - 1][s_co.second]);
+    updateCoinTime(droid, maze[s_co.first][s_co.second + 1]);
+    updateCoinTime(droid, maze[s_co.first][s_co.second - 1]);
 }
 
-void Simulation::updatePlayerVisibility(Player &p){
-    viewPort[0] = SCREEN_WIDTH * int((p.xpos + p.width/2)/SCREEN_WIDTH);
-    viewPort[1] = SCREEN_HEIGHT * int((p.ypos + p.height/2)/SCREEN_HEIGHT);
-    // std::cout<<"In quadrant: "<<rect.x<<" "<<rect.y<<'\n';
-
+void MazeCell::incrementExplored(){
+    explorationCounter++;
 }
 
 void Simulation::updateVisibility(){
-    if(isServer){
-        updatePlayerVisibility(sPlayer);
-    }
-    else{
-        updatePlayerVisibility(cPlayer);
+    for(int i =0; i<MAZEROWS; i++){
+        for(int j = 0; j<MAZECOLS; j++){
+            SDL_Rect rect;
+            rect.x = droid.xpos; rect.y = droid.ypos;
+            rect.w = droid.width; rect.h = droid.height;
+            if(SDL_HasIntersection(&rect, &maze[i][j].dstR) && !maze[i][j].explored){
+                maze[i][j].explored = true;
+            }
+        }
     }
 }

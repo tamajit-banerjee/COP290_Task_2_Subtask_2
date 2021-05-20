@@ -1,5 +1,5 @@
 #include "Header.h"
-#include "constans.h"
+#include "constants.h"
 #include "font.hpp"
 #include "menu.hpp"
 #include "simulation.h"
@@ -16,8 +16,8 @@ int main(){
             "simulation",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
-            SCREEN_WIDTH,
-            SCREEN_HEIGHT,
+            SCREEN_WIDTH + PADDING_RIGHT + PADDING_LEFT,
+            SCREEN_HEIGHT + PADDING_BOTTOM + PADDING_TOP,
             0);
 
     if (window == NULL) {
@@ -38,25 +38,18 @@ int main(){
     Simulation *simulation = new Simulation();
     simulation->init(renderer, font);
 
-    SDL_Rect viewPort;
-    viewPort.h = SCREEN_HEIGHT; viewPort.w = SCREEN_WIDTH;
-    viewPort.x = 0; viewPort.y = 0;
-    SDL_RenderSetViewport(renderer, &viewPort);
-
     char name[100];
     for(int i = 0; i<100; i++){name[i] = ' ';}
-    simulation->sPlayer.name = name;
+    simulation->droid.name = name;
     simulation->init(renderer, font);
-    simulation->isServer = true;
 
-    simulation->levelStart(0);
     while (simulation->running()) {
         
         simulation->handleEvents();
         simulation->update();
         simulation->render();
 
-        if(simulation->sPlayer.time<=0){
+        if(simulation->droid.time<=0){
             simulation->isRunning = false;
         }
     }

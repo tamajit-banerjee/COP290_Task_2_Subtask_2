@@ -1,29 +1,10 @@
 #pragma once
 
-#define VIEW_FACTOR 2
-#define CELL_SIZE 64*VIEW_FACTOR
-#define MAZECOLS 10
-#define MAZEROWS 10
-
-#define SCREEN_WIDTH (MAZECOLS * CELL_SIZE / VIEW_FACTOR)
-#define SCREEN_HEIGHT (MAZECOLS * CELL_SIZE / VIEW_FACTOR)
-
-#define COIN_SIZE (CELL_SIZE / 2)
-#define COIN_SCORE 10
-
-#define SPEED 2
-#define LEVELS 4
-
-#define MONSTERS 4
-
-#define SEPARATOR '|'
-#define FREEZE_LIMIT 20
-#define WALL_RATIO 8
-
-
+#include <chrono>
+#include <thread>
 
 #include "Header.h"
-#include "constans.h"
+#include "constants.h"
 #include "font.hpp"
 #include "menu.hpp"
 
@@ -52,7 +33,7 @@ public:
     void encode(int x[]);
     void decode(int y[]);
 
-	void draw(SDL_Renderer *renderer, TTF_Font *font, int * viewPort);
+	void draw(SDL_Renderer *renderer, TTF_Font *font);
 	void dispName(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos);
 	void dispScore(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos);
 	void dispTime(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos);
@@ -83,6 +64,10 @@ class MazeCell{
 public:
 	bool hascoin;
 	bool hastime;
+	bool explored;
+	int explorationCounter;
+	void incrementExplored();
+	void resetCounter();
 	int id; 
 	// id denotes which type of cell it is. refer to walls_mapping.png for reference
 	SDL_Rect srcR, dstR;
@@ -103,29 +88,15 @@ public:
 	void update();
 	bool running() { return isRunning; }
 	void render();
-	void levelStart(int level);
-	void levelEnd();
-
-	void updateVisibility();
-	void updatePlayerVisibility(Player &p);
-	int viewPort[2];
 
 	SDL_Renderer *renderer;
 	TTF_Font *font;
 	SDL_Event event;
 
 	bool isRunning;
-	bool isLevelRunning;
-	int level;
 
-	Player sPlayer, cPlayer;
-	bool isServer;
-
-	Monster monsters[MONSTERS];
-	void initMonsters();
-	void checkMonsterCollisions(Player &p);
-	void handleMonsterCollisions();
-	void updateMonsters();
+	Player droid;
+	void updateVisibility();
 
 	void renderMaze();
     bool ok(int x, int y);
@@ -145,14 +116,11 @@ public:
 	void placeCoins();
 	void checkCoinTimeEat();
 	void updateCoinTime(Player & p, MazeCell & m);
-
-	SDL_Texture *timeTex;
-	void placeTimes();
-
+	
 	void loadTexture(char *textName, char *path);
 
 	Simulation(){}
 	~Simulation(){}
 
-	int counter;
+	int simulationTime;
 };

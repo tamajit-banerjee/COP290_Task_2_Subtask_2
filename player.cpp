@@ -51,12 +51,12 @@ void Player::setPosCenter(int i, int j){
     ypos = j*CELL_SIZE + CELL_SIZE/2 - height/2;
 }
 
-void Player::draw(SDL_Renderer *renderer, TTF_Font *font, int * viewPort){
+void Player::draw(SDL_Renderer *renderer, TTF_Font *font){
     SDL_Rect destR;
     destR.h = height;
     destR.w = width;
-    destR.x = xpos - viewPort[0];
-    destR.y = ypos - viewPort[1];
+    destR.x = xpos + PADDING_LEFT;
+    destR.y = ypos + PADDING_TOP;
 
     SDL_Rect srcR;
     srcR.h = PLAYER_HEIGHT_SRC;
@@ -103,16 +103,15 @@ void Player::dispTime(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos
 std::pair<int,int> Player::move(int s){
     old_xpos = xpos, old_ypos = ypos;
     int new_x = xpos, new_y = ypos;
-    if(!freeze and !final_freeze){
-        if(right)
-            new_x+=s;
-        if(left)
-            new_x-=s;
-        if(up)
-            new_y-=s;
-        if(down)
-            new_y+=s;
-    }
+    // std::cout<<xpos<<" "<<right<<'\n';
+    if(right)
+        new_x+=s;
+    if(left)
+        new_x-=s;
+    if(up)
+        new_y-=s;
+    if(down)
+        new_y+=s;
     return std::make_pair(new_x, new_y);
 }
 
