@@ -303,6 +303,59 @@ std::vector<int> Simulation::TSP_Dynamic_Prog( int n, int *price , std::vector<s
 
 }
 
+#define INT_MAX 999999
+
+vector<int> dist;
+vector<int> price;
+
+bool compare(int i , int j , int *ptice){
+  
+  return price[i] * dist[j] >= price[j] * dist[i];
+
+}
+
+std::vector<int> Simulation::TSP_Dynamic_Prog( int n, int *price , std::vector<std::vector<int> > cost){
+
+
+  int n;
+  cin>>n;
+  int tot_time = 0;
+  bool used[n] = {false};
+  int cur = n;
+  int num = 0;
+
+
+  
+  while(num < n ){
+        vector<int> left;
+
+        for(int i=0;i<n;i++){
+            if(!used[i])
+                left.push_back(i);
+        }
+
+        sort(left.begin(),left.end(),compare);
+
+        for(int i=0;i<left.size();i++){
+
+            if( tot_time + dist[cur][left[i]] + dist[left[i]][n] <= MAX_TIME){
+                cur = left[i];
+                tot_time = tot_time + dist[cur][left[i]];
+                used[left[i]] = true;
+                ++num;
+                break;
+            }else{
+                used[left[i]] = true;
+                ++num;
+            }
+        }
+        cout<<cur<<"\n";
+  }
+
+
+}
+
+
 void Simulation::updateDroid(){    
 
     SDL_Rect rect;
@@ -378,6 +431,7 @@ void makeRect(int x1, int y1, int x2, int y2, SDL_Rect * rect, int type){
 }
 
 void Simulation::addLines(){
+
     SDL_Rect rect;
     rect.w = CELL_SIZE;
     rect.h = CELL_SIZE;
