@@ -31,8 +31,10 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
 
     int random_i = std::rand() % int(MAZEROWS/3);
     int random_j = std::rand() % int(MAZECOLS/3);
-    
-    droid.setPosCenter(random_i, random_j);
+    calc_path(8);
+    path_counter = 0;
+
+    droid.setPosCenter(0, 0);
     // droid.setPosCenter(1, 1);
     droid.dest = (MAZEROWS)*(MAZECOLS);
 

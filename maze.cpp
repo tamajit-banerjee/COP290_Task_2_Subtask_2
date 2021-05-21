@@ -339,6 +339,7 @@ void Simulation::maze_dist_update(){
                         d[u] = d[v] + 1;
                         p[u] = v;
                         maze[row][col-1].to_go[s] = 1;
+                        maze[row][col-1].to_go_dist[s] = d[u];
                     }
                 }
 
@@ -350,6 +351,7 @@ void Simulation::maze_dist_update(){
                         d[u] = d[v] + 1;
                         p[u] = v;
                         maze[row][col+1].to_go[s] = 0;
+                        maze[row][col+1].to_go_dist[s] = d[u];
                     }
                 }
 
@@ -361,6 +363,7 @@ void Simulation::maze_dist_update(){
                         d[u] = d[v] + 1;
                         p[u] = v;
                         maze[row-1][col].to_go[s] = 3;
+                        maze[row-1][col].to_go_dist[s] = d[u];
                     }
                 }
 
@@ -372,6 +375,7 @@ void Simulation::maze_dist_update(){
                         d[u] = d[v] + 1;
                         p[u] = v;
                         maze[row+1][col].to_go[s] = 2;
+                        maze[row+1][col].to_go_dist[s] = d[u];
                     }
                 }
             }

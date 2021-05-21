@@ -56,6 +56,7 @@ public:
 	bool explored;
 	int explorationCounter;
 	int to_go[MAZECOLS*MAZEROWS];
+	int to_go_dist[MAZECOLS*MAZEROWS];
 	void incrementExplored();
 	void resetCounter();
 	int id; 
@@ -83,6 +84,8 @@ public:
 	TTF_Font *font;
 	SDL_Event event;
 
+	std::vector<int> simulation_path;
+	int path_counter;
 	bool isRunning;
 
 	Player droid;
@@ -106,7 +109,8 @@ public:
 	void placeCoins();
 	void checkCoinTimeEat();
 	void updateCoinTime(Player & p, MazeCell & m);
-	
+	std::vector<int> TSP_Dynamic_Prog( int n, int *price , std::vector<std::vector<int> > cost);
+	void calc_path(int n);
 	void loadTexture(char *textName, char *path);
 	void maze_dist_update();
 	bool centre();

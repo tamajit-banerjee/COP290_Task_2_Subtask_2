@@ -182,26 +182,134 @@ int distSquare(int ran, std::pair<int, int> i_j){
     return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
 }
 
+void Simulation::calc_path(int n){
+
+        int price[n],m[n+1];
+        for(int i=0;i<n;i++){
+            price[i] = rand()%1000;
+        }
+        bool used[MAZECOLS*MAZEROWS] = {false};
+        used[0] = true;
+        for(int i=0;i<n;i++){
+            int temp = rand()%(MAZECOLS*MAZEROWS);
+            while(used[temp])
+                temp = rand()%(MAZECOLS*MAZEROWS);
+            m[i] =temp;
+           // std::cout<<temp<<"\n";
+            used[temp] =true;
+        }
+        m[n] = 0;
+        std::vector<std::vector<int> > cost;
+        for(int i=0;i<=n;i++){
+            std::vector<int> temp;
+                int row = m[i]/MAZECOLS;
+                int col = m[i]%MAZEROWS;
+            for(int j=0;j<=n;j++){
+                if(i==j){
+                    temp.push_back(0);
+                }else{
+                temp.push_back(maze[row][col].to_go_dist[m[j]]);
+                }
+            }
+            cost.push_back(temp);
+        }
+
+        std::vector<int> path = TSP_Dynamic_Prog(n,price,cost);
+        simulation_path.clear();
+        for(int i=0;i<path.size();i++){
+            simulation_path.push_back(m[path[i]]);
+            std::cout<<m[path[i]]<<"\n";
+        }
+
+}
+
+std::vector<int> Simulation::TSP_Dynamic_Prog( int n, int *price , std::vector<std::vector<int> > cost){
+
+
+    int dp_cost[(1<<n)][n];
+        for(int i=0;i<(1<<n);i++){
+
+        for(int j=0;j<n;j++){
+            dp_cost[i][j] = INT_MAX ;
+        }
+
+    }
+
+    std::vector<int> path;
+
+    int parent[(1<<n)][n];
+
+    for(int mask=0;mask<(1<<n)-1;mask++){
+        if(mask == 0 ){
+            for(int bomb= 0;bomb<n;bomb++){
+                            dp_cost[mask|(1<<bomb)][bomb] = fmin(dp_cost[mask|(1<<bomb)][bomb],cost[n][bomb]);
+                            parent[mask|(1<<bomb)][bomb] = n;
+                    }
+        }else{
+            for(int bomb= 0;bomb<n;bomb++){
+
+                if( ( (mask&(1<<bomb)) == 0 )  ){
+                    for(int pos = 0;pos<n;pos++){
+                        if(  mask&(1<<pos)   ){
+                            if( dp_cost[mask|(1<<bomb)][bomb] > dp_cost[mask][pos] + cost[pos][bomb] ){
+                                    dp_cost[mask|(1<<bomb)][bomb] = dp_cost[mask][pos] + cost[pos][bomb];
+                                    parent[mask|(1<<bomb)][bomb] = pos;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    int answer = 0;
+    for(int mask=1;mask<(1<<n);mask++){
+
+    int tot_cost = 0;
+
+    for(int bomb=0;bomb<n;bomb++){
+        if(mask&(1<<bomb)){
+            tot_cost += price[bomb];
+        }
+    }
+
+    for(int pos = 0;pos<n;pos++){
+        if(  mask & (1<<pos)   ){
+            if( dp_cost[mask][pos] + cost[pos][n] < 1000){
+                if(answer < tot_cost ){
+                    path.clear();
+                    answer = tot_cost;
+                    int temp = mask;
+                    int cur = pos;
+                    while(temp > 0 ){
+                        int old = cur;
+                        path.push_back(cur);
+                        cur = parent[temp][cur];
+                        temp -= (1<<old);
+                    }
+                    path.push_back(n);
+                }
+            }
+        }
+        }
+
+    }
+
+    reverse(path.begin(),path.end());
+
+    return path;
+
+}
+
 void Simulation::updateDroid(){    
     std::pair<int, int> i_j = droid.getMazeCoordinates(maze[0][0].dstR);
     if(centre()){
-        
-        if(droid.changeDirCounter <= 0){
-            if(rand()%10 < 2)
-                droid.changeDirCounter = 0 ;
-            else 
-                droid.changeDirCounter = CHANGE_DIR_TIME;
-            
-            
-            srand(simulationTime);
-            droid.dest =  rand()%(MAZECOLS * MAZEROWS);
-            while (distSquare(droid.dest, i_j) < 48 && maze[droid.dest/MAZECOLS][droid.dest%MAZECOLS].explored)
-                droid.dest =  rand()%(MAZECOLS * MAZEROWS);
-        }
-        else{
-            droid.changeDirCounter -- ;
-        }
 
+        if(i_j.first == simulation_path[path_counter]/MAZECOLS && i_j.second == simulation_path[path_counter]% MAZECOLS ) {
+            ++path_counter;
+            path_counter = (path_counter%simulation_path.size());
+            droid.dest = simulation_path[path_counter];
+        }
 
         droid.left = 0;
         droid.right = 0;
@@ -230,8 +338,9 @@ void Simulation::updateDroid(){
 
 void makeRect(int x1, int y1, int x2, int y2, SDL_Rect * rect, int type){
     int width = 5;
-    int offset = -10*(2*type - 1);
-    // int offset = 0;
+
+   // int offset = -10*(2*type - 1);
+     int offset = 0;
 
 
     if(x1 == x2){
@@ -263,12 +372,12 @@ void Simulation::addLines(){
     if(droid.last_j != -1 && droid.last_i !=-1){
         SDL_Rect rect;
         // if(droid.isBackTracking){
-            makeRect(CELL_SIZE/2 + CELL_SIZE * i_j.second, CELL_SIZE/2 + CELL_SIZE * i_j.first, CELL_SIZE/2 + CELL_SIZE * droid.last_j, CELL_SIZE/2 + CELL_SIZE * droid.last_i, &rect, 1);
-            linesBacktrack.push_back(rect);
+          //  makeRect(CELL_SIZE/2 + CELL_SIZE * i_j.second, CELL_SIZE/2 + CELL_SIZE * i_j.first, CELL_SIZE/2 + CELL_SIZE * droid.last_j, CELL_SIZE/2 + CELL_SIZE * droid.last_i, &rect, 1);
+         //   linesBacktrack.push_back(rect);
         // }
         // else{
             makeRect(CELL_SIZE/2 + CELL_SIZE * i_j.second, CELL_SIZE/2 + CELL_SIZE * i_j.first, CELL_SIZE/2 + CELL_SIZE * droid.last_j, CELL_SIZE/2 + CELL_SIZE * droid.last_i, &rect, 0);
-            linesForward.push_back(rect);
+              linesForward.push_back(rect);
         // }
     }
 
