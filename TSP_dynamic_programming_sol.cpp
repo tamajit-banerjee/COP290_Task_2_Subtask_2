@@ -1,56 +1,59 @@
-TSP_dynamic_programming_sol.cpp
-
 #include<iostream>
 using namespace std;
 
 #define INT_MAX 999999
 
-int n=4;
-int dist[10][10] = {
-        {0,20,42,25},
-        {20,0,30,34},
-        {42,30,0,10},
-        {25,34,10,0}
-};
-int VISITED_ALL = (1<<n) -1;
-
-int dp[16][4];
-
-
-int  tsp(int mask,int pos){
-
-    if(mask==VISITED_ALL){
-        return dist[pos][0];
-    }
-    if(dp[mask][pos]!=-1){
-       return dp[mask][pos];
-    }
-
-    //Now from current node, we will try to go to every other node and take the min ans
-    int ans = INT_MAX;
-
-    //Visit all the unvisited cities and take the best route
-    for(int city=0;city<n;city++){
-
-        if((mask&(1<<city))==0){
-
-            int newAns = dist[pos][city] + tsp( mask|(1<<city), city);
-            ans = min(ans, newAns);
-        }
-
-    }
-
-    return dp[mask][pos] = ans;
-} 
-
 int main(){
     /* init the dp array */
     for(int i=0;i<(1<<n);i++){
+
         for(int j=0;j<n;j++){
-            dp[i][j] = -1;
+            dp_cost[i][j] = INT_MAX ;
+        }
+
+    }
+
+
+
+    for(int mask=0;mask<(1<<n)-1;mask++){
+        if(mask == 0 ){
+            for(int bomb= 0;bomb<n;bomb++){
+                            dp_cost[mask|(1<<bomb)][bomb] = min(dp_cost[mask|(1<<bomb)][bomb],cost[n][bomb]);
+                    }
+        }else{
+            for(int bomb= 0;bomb<n;bomb++){
+
+                if( ( mask&(1<<bomb) == 0 )  ){
+                    for(int pos = 0;pos<n;pos++){
+                        if( ( mask&(1<<pos)   ){
+                            dp_cost[mask|(1<<bomb)][bomb] = min(dp_cost[mask|(1<<bomb)][bomb],dp_cost[mask][pos] + cost[pos][bomb]);
+                        }
+                    }
+                }
+            }
         }
     }
-    cout<<"Travelling Saleman Distance is "<<tsp(1,0);
+
+    int answer = 0;
+    for(int mask=1;mask<(1<<n);mask++){
+
+    int tot_cost = 0;
+
+    for(int bomb=0;bomb<n;bomb++){
+        if(mask&(1<<bomb)){
+            tot_cost += price[bomb];
+        }
+    }
+
+    for(int pos = 0;pos<n;pos++){
+        if( ( mask & (1<<pos)   ){
+            if( dp_cost[mask][pos] + cost[pos][n] < TOT_TIME )
+            answer = max(tot_cost,ans);
+        }
+        }
+    }
+
+    cout<<answer<<"\n";
 
 return 0;
 }

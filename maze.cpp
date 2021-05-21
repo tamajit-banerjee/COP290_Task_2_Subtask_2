@@ -227,14 +227,14 @@ void Simulation::renderMaze(){
             maze[i][j].dstR.x = maze[i][j].dstR.w * j;
             maze[i][j].dstR.y = maze[i][j].dstR.h * i;
 
-            if(!maze[i][j].explored){
-                continue;
-            }
-            if(maze[i][j].explorationCounter >= 100*MEMORY){
-                maze[i][j].resetCounter();
-                // maze[i][j].explored = false;
-                continue;
-            }
+//            if(!maze[i][j].explored){
+//                continue;
+//            }
+//            if(maze[i][j].explorationCounter >= 100*MEMORY){
+//                maze[i][j].resetCounter();
+//                // maze[i][j].explored = false;
+//                continue;
+//            }
             maze[i][j].explorationCounter ++ ;
 
             SDL_Rect mazedstR;
