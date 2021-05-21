@@ -4,6 +4,15 @@ using namespace std;
 
 #define INT_MAX 999999
 
+vector<int> dist;
+vector<int> price;
+
+bool compare(int i , int j){
+  
+  return price[i] * dist[j] >= price[j] * dist[i];
+
+}
+
 int main(){
   int n;
   cin>>n;
@@ -11,6 +20,8 @@ int main(){
   bool used[n] = {false};
   int cur = n;
   int num = 0;
+
+
   
   while(num < n ){
         vector<int> left;
@@ -18,7 +29,21 @@ int main(){
             if(!used[i])
                 left.push_back(i);
         }
-        sort(left.begin(),left.end(),compare)
+        sort(left.begin(),left.end(),compare);
+
+        for(int i=0;i<left.size();i++){
+            if( tot_time + dist[cur][left[i]] + dist[left[i]][n] < MAX_TIME){
+                cur = left[i];
+                tot_time = tot_time + dist[cur][left[i]] + dist[left[i]][n];
+                used[left[i]] = true;
+                ++num;
+                break;
+            }else{
+                used[left[i]] = true;
+                ++num;
+            }
+        }
+        cout<<cur<<"\n";
   }
 
 
