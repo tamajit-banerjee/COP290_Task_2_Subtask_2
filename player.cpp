@@ -156,11 +156,11 @@ std::pair<int, int> Player::getMazeCoordinates(SDL_Rect &r){
     int j = 0;
     while(i<MAZEROWS){
         while(j<MAZECOLS){
-            if(xpos>=r.w * j)
+            if(xpos+width/2>=r.w * j)
                 j+=1;
-            if(ypos>=r.h * i)
+            if(ypos+height/2>=r.h * i)
                 i+=1;
-            if(xpos<r.w * j && ypos<r.h * i)
+            if(xpos+width/2<r.w * j && ypos+height/2<r.h * i)
                 return std::make_pair(i-1, j-1);
         }
     }
@@ -185,25 +185,27 @@ int distSquare(int ran, std::pair<int, int> i_j){
 void Simulation::calc_path(int n){
 
         int price[n],m[n+1];
+
         for(int i=0;i<n;i++){
             price[i] = rand()%1000;
         }
+
         bool used[MAZECOLS*MAZEROWS] = {false};
-        used[0] = true;
+        used[MAZECOLS+1] = true;
         for(int i=0;i<n;i++){
             int temp = rand()%(MAZECOLS*MAZEROWS);
             while(used[temp])
                 temp = rand()%(MAZECOLS*MAZEROWS);
             m[i] =temp;
-           // std::cout<<temp<<"\n";
+         //  std::cout<<temp<<"\n";
             used[temp] =true;
         }
-        m[n] = 0;
+        m[n] = MAZECOLS+1;
         std::vector<std::vector<int> > cost;
         for(int i=0;i<=n;i++){
             std::vector<int> temp;
                 int row = m[i]/MAZECOLS;
-                int col = m[i]%MAZEROWS;
+                int col = m[i]%MAZECOLS;
             for(int j=0;j<=n;j++){
                 if(i==j){
                     temp.push_back(0);
@@ -218,7 +220,7 @@ void Simulation::calc_path(int n){
         simulation_path.clear();
         for(int i=0;i<path.size();i++){
             simulation_path.push_back(m[path[i]]);
-            std::cout<<m[path[i]]<<"\n";
+         //   std::cout<<m[path[i]]<<"\n";
         }
 
 }
@@ -242,7 +244,7 @@ std::vector<int> Simulation::TSP_Dynamic_Prog( int n, int *price , std::vector<s
     for(int mask=0;mask<(1<<n)-1;mask++){
         if(mask == 0 ){
             for(int bomb= 0;bomb<n;bomb++){
-                            dp_cost[mask|(1<<bomb)][bomb] = fmin(dp_cost[mask|(1<<bomb)][bomb],cost[n][bomb]);
+                            dp_cost[mask|(1<<bomb)][bomb] = cost[n][bomb];
                             parent[mask|(1<<bomb)][bomb] = n;
                     }
         }else{
@@ -275,7 +277,7 @@ std::vector<int> Simulation::TSP_Dynamic_Prog( int n, int *price , std::vector<s
 
     for(int pos = 0;pos<n;pos++){
         if(  mask & (1<<pos)   ){
-            if( dp_cost[mask][pos] + cost[pos][n] < 1000){
+            if( dp_cost[mask][pos] + cost[pos][n] < 10){
                 if(answer < tot_cost ){
                     path.clear();
                     answer = tot_cost;
@@ -302,10 +304,19 @@ std::vector<int> Simulation::TSP_Dynamic_Prog( int n, int *price , std::vector<s
 }
 
 void Simulation::updateDroid(){    
-    std::pair<int, int> i_j = droid.getMazeCoordinates(maze[0][0].dstR);
-    if(centre()){
 
-        if(i_j.first == simulation_path[path_counter]/MAZECOLS && i_j.second == simulation_path[path_counter]% MAZECOLS ) {
+    SDL_Rect rect;
+    rect.w = CELL_SIZE;
+    rect.h = CELL_SIZE;
+    rect.x = 0;
+    rect.y = 0;
+    
+    std::pair<int, int> i_j = droid.getMazeCoordinates(rect);
+    //std::cout<<i_j.first <<" "<<i_j.second<<"\n";
+    if(centre()){
+        // std::cout<<droid.xpos <<" "<<droid.ypos<<"\n";
+        // std::cout<<"musti"<<i_j.first <<" "<<i_j.second<<"\n";
+        if(i_j.first == droid.dest/MAZECOLS && i_j.second == droid.dest% MAZECOLS ) {
             ++path_counter;
             path_counter = (path_counter%simulation_path.size());
             droid.dest = simulation_path[path_counter];
@@ -367,7 +378,12 @@ void makeRect(int x1, int y1, int x2, int y2, SDL_Rect * rect, int type){
 }
 
 void Simulation::addLines(){
-    std::pair<int, int> i_j = droid.getMazeCoordinates(maze[0][0].dstR);
+    SDL_Rect rect;
+    rect.w = CELL_SIZE;
+    rect.h = CELL_SIZE;
+    rect.x = 0;
+    rect.y = 0;
+    std::pair<int, int> i_j = droid.getMazeCoordinates(rect);
 
     if(droid.last_j != -1 && droid.last_i !=-1){
         SDL_Rect rect;

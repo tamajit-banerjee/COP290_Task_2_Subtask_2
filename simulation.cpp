@@ -26,19 +26,16 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     simulationTime = 0;
     mazeInit();
     maze_gen();
+    maze_dist_update();
     droid.time = 10000;
     droid.final_freeze = false;
+    calc_path(5);
+    path_counter = 0 ;
 
-    int random_i = std::rand() % int(MAZEROWS/3);
-    int random_j = std::rand() % int(MAZECOLS/3);
-    calc_path(8);
-    path_counter = 0;
-
-    droid.setPosCenter(0, 0);
+    droid.setPosCenter(1,1);
+    droid.dest=MAZECOLS+1;
     // droid.setPosCenter(1, 1);
-    droid.dest = (MAZEROWS)*(MAZECOLS);
-
-    maze_dist_update();
+    //droid.dest = (MAZEROWS)*(MAZECOLS);
 }
 
 void Simulation::handleEvents()
