@@ -7,22 +7,22 @@
 #define PLAYER_HEIGHT_SRC 1020
 #define RENDER_PLAYER_DELAY 10
 
-#define PADDING_TOP 100
+#define PADDING_TOP 0
 #define PADDING_BOTTOM 0
-#define PADDING_RIGHT 100
-#define PADDING_LEFT 100
+#define PADDING_RIGHT 0
+#define PADDING_LEFT 0
 
 #define MEMORY 20
 
 #define CELL_SIZE 64
-#define MAZECOLS 10
-#define MAZEROWS 10
+#define MAZECOLS 12
+#define MAZEROWS 12
 
 #define SCREEN_WIDTH (MAZECOLS * CELL_SIZE)
 #define SCREEN_HEIGHT (MAZECOLS * CELL_SIZE)
 
-#define COIN_SIZE (CELL_SIZE / 2)
-#define COIN_SCORE 10
+#define bomb_SIZE (CELL_SIZE)
+#define bomb_SCORE 10
 
 #define SPEED 2
 #define LEVELS 4

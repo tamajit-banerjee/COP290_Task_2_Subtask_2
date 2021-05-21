@@ -10,11 +10,12 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
 
     loadTexture("player", "resources/droid.bmp");
     loadTexture("maze", "resources/maze.bmp");
-    loadTexture("coin", "resources/coins.bmp");
+    loadTexture("bomb", "resources/bomb.bmp");
     
     loadTexture("forward_line", "resources/forward_line.bmp");
     loadTexture("back_line", "resources/back_line.bmp");
     loadTexture("intro", "resources/droid_intro.bmp");
+    loadTexture("destination", "resources/destination.bmp");
 
     droid.playerId = 1;
     droid.player_no = 1;
@@ -74,7 +75,7 @@ void Simulation::update(){
     }
 
     updateDroid();
-    checkCoinTimeEat();
+    checkbombTimeEat();
     updateVisibility();
     // std::this_thread::sleep_for(std::chrono::milliseconds(50));
     
@@ -111,9 +112,9 @@ void Simulation::loadTexture(char *textName, char *path){
         mazeTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
         SDL_FreeSurface(tmpSurface);
     }
-    else if(strcmp(textName, "coin") == 0){
+    else if(strcmp(textName, "bomb") == 0){
         tmpSurface = SDL_LoadBMP(path);
-        coinTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+        bombTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
         SDL_FreeSurface(tmpSurface);
     }
     else if(strcmp(textName, "forward_line") == 0){
@@ -131,6 +132,12 @@ void Simulation::loadTexture(char *textName, char *path){
         introTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
         SDL_FreeSurface(tmpSurface);
     }
+    else if(strcmp(textName, "destination") == 0){
+        tmpSurface = SDL_LoadBMP(path);
+        destTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+        SDL_FreeSurface(tmpSurface);
+    }
+    
 }
 
 // void Simulation::DisplayInfo(){

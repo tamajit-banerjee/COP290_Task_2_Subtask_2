@@ -51,7 +51,7 @@ public:
 
 class MazeCell{
 public:
-	bool hascoin;
+	bool hasbomb;
 	bool hastime;
 	bool explored;
 	int explorationCounter;
@@ -104,11 +104,11 @@ public:
 	void mazeInit();
 	bool checkWallCollisions(int x, int y, int w, int h);
 
-	SDL_Texture *coinTex;
-	int coinCycle, timeCycle;
-	void placeCoins();
-	void checkCoinTimeEat();
-	void updateCoinTime(Player & p, MazeCell & m);
+	SDL_Texture *bombTex;
+	int bombCycle, timeCycle;
+	void placebombs();
+	void checkbombTimeEat();
+	void updatebombTime(Player & p, MazeCell & m);
 	std::vector<int> TSP_Dynamic_Prog( int n, int *price , std::vector<std::vector<int> > cost);
 	void calc_path(int n);
 	void loadTexture(char *textName, char *path);
@@ -130,4 +130,5 @@ public:
 
 	int intorduce();
 	SDL_Texture *introTex;
+	SDL_Texture *destTex;
 };

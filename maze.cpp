@@ -216,8 +216,8 @@ void MazeCell::resetCounter(){
 void Simulation::renderMaze(){
     int cell_width = CELL_SIZE;
     int cell_height = CELL_SIZE;
-    int coin_width = COIN_SIZE;
-    int coin_height = COIN_SIZE;
+    int bomb_width = bomb_SIZE;
+    int bomb_height = bomb_SIZE;
     for(int i =0; i<MAZEROWS; i++){
         for(int j = 0; j<MAZECOLS; j++){
             
@@ -246,37 +246,45 @@ void Simulation::renderMaze(){
                 std::cout<<SDL_GetError()<<"\n";
                 exit(EXIT_FAILURE);
             }
+            if(i*MAZECOLS + j == droid.dest){
+                SDL_Rect temp;
+                temp.x = maze[i][j].dstR.x + PADDING_LEFT;
+                temp.y = maze[i][j].dstR.y + PADDING_TOP;
+                temp.h = maze[i][j].dstR.h;
+                temp.w = maze[i][j].dstR.w;
+                if(SDL_RenderCopyEx(renderer, destTex, NULL, &temp, 0.0, NULL, SDL_FLIP_NONE) < 0){
+                    std::cout<<"Maze cell"<<i<<", "<<j<<" not rendered properly\n";
+                    std::cout<<SDL_GetError()<<"\n";
+                    exit(EXIT_FAILURE);
+                }
+            }
 
-            SDL_Rect dstR, srcR;
-            srcR.w = 160;
-            srcR.h = 160;
-            srcR.x = srcR.w * ((coinCycle/10)%8);
-            srcR.y = 0;
+            SDL_Rect dstR;
 
-            dstR.w = coin_width;
-            dstR.h = coin_height;
-            dstR.x = cell_width * j + (cell_width - coin_width)/2 + PADDING_LEFT;
-            dstR.y = cell_height * i + (cell_height - coin_height)/2 + PADDING_TOP;
+            dstR.w = bomb_width;
+            dstR.h = bomb_height;
+            dstR.x = cell_width * j + (cell_width - bomb_width)/2 + PADDING_LEFT;
+            dstR.y = cell_height * i + (cell_height - bomb_height)/2 + PADDING_TOP;
             
-            if(maze[i][j].hascoin){
-                if(SDL_RenderCopyEx(renderer, coinTex,  &srcR, &dstR, 0.0, NULL, SDL_FLIP_NONE) < 0){
-                    std::cout<<"Coin not rendered properly\n";
+            if(maze[i][j].hasbomb){
+                if(SDL_RenderCopyEx(renderer, bombTex,  NULL, &dstR, 0.0, NULL, SDL_FLIP_NONE) < 0){
+                    std::cout<<"bomb not rendered properly\n";
                     std::cout<<SDL_GetError()<<"\n";
                     exit(EXIT_FAILURE);
                 }
             }
         }
     }
-    coinCycle = (coinCycle + 1)%80;
+    bombCycle = (bombCycle + 1)%80;
 
 }
 
-void Simulation::placeCoins(){
-    maze[0][3].hascoin = true;
-    maze[1][5].hascoin = true;
-    maze[3][7].hascoin = true;
-    maze[4][8].hascoin = true;
-    maze[9][4].hascoin = true;
+void Simulation::placebombs(){
+    maze[0][3].hasbomb = true;
+    maze[1][5].hasbomb = true;
+    maze[3][7].hasbomb = true;
+    maze[4][8].hasbomb = true;
+    maze[9][4].hasbomb = true;
 }
 
 
@@ -284,14 +292,14 @@ void Simulation::mazeInit(){
     for(int i =0; i<MAZEROWS; i++){
         for(int j = 0; j<MAZECOLS; j++){
             maze[i][j].update(15);
-            maze[i][j].hascoin = false;
+            maze[i][j].hasbomb = false;
             maze[i][j].hastime = false;
             maze[i][j].explored = false;
             maze[i][j].resetCounter();
         }
     }
-    coinCycle = 0;
-    placeCoins();
+    bombCycle = 0;
+    placebombs();
 }
 
 
@@ -429,7 +437,7 @@ bool Simulation::checkWallCollisions(int x, int y, int w, int h){
 bool isOnPower(int x, int y, int w, int h, SDL_Rect & rect){
     // std::cout<<"width "<<w<<"x: "<<x<<"y: "<<y<<'\n';
     // std::cout<<"r width "<<rect.w<<"r x: "<<rect.x<<"r y: "<<rect.y<<'\n';
-    int threshold = COIN_SIZE;
+    int threshold = bomb_SIZE;
     int count = 0;
     if((x - rect.x + w/2 - int(rect.w/2))*(x - rect.x + w/2 - int(rect.w/2)) < threshold*threshold)
         count ++;
@@ -441,17 +449,17 @@ bool isOnPower(int x, int y, int w, int h, SDL_Rect & rect){
         return false;
 }
 
-bool playerOnCoin(Player & p, MazeCell & m){
-    // std::cout<<m.hascoin<<isOnCoin(p.xpos, p.ypos, p.width, p.height, m.dstR);
-    if(m.hascoin && isOnPower(p.xpos, p.ypos, p.width, p.height, m.dstR)){
-        m.hascoin = false;
-        p.score += COIN_SCORE;
+bool playerOnbomb(Player & p, MazeCell & m){
+    // std::cout<<m.hasbomb<<isOnbomb(p.xpos, p.ypos, p.width, p.height, m.dstR);
+    if(m.hasbomb && isOnPower(p.xpos, p.ypos, p.width, p.height, m.dstR)){
+        m.hasbomb = false;
+        p.score += bomb_SCORE;
         return true;
     }
     return false;
 }
 bool playerOnTime(Player & p, MazeCell & m){
-    // std::cout<<m.hascoin<<isOnCoin(p.xpos, p.ypos, p.width, p.height, m.dstR);
+    // std::cout<<m.hasbomb<<isOnbomb(p.xpos, p.ypos, p.width, p.height, m.dstR);
     if(m.hastime && isOnPower(p.xpos, p.ypos, p.width, p.height, m.dstR)){
         m.hastime = false;
         return true;
@@ -459,33 +467,33 @@ bool playerOnTime(Player & p, MazeCell & m){
     return false;
 }
 
-void Simulation::updateCoinTime(Player & p, MazeCell & m){
+void Simulation::updatebombTime(Player & p, MazeCell & m){
     int random_i = std::rand() % MAZEROWS;
     int random_j = std::rand() % MAZECOLS;
-    if(playerOnCoin(p, m)){
-        while(maze[random_i][random_j].hascoin == true || maze[random_i][random_j].hastime == true){
+    if(playerOnbomb(p, m)){
+        while(maze[random_i][random_j].hasbomb == true || maze[random_i][random_j].hastime == true){
             random_i = std::rand() % MAZEROWS;
             random_j = std::rand() % MAZECOLS;
         }
-        maze[random_i][random_j].hascoin = true;
+        maze[random_i][random_j].hasbomb = true;
     }
     random_i = std::rand() % MAZEROWS;
     random_j = std::rand() % MAZECOLS;
     if(playerOnTime(p, m)){
-        while(maze[random_i][random_j].hascoin == true || maze[random_i][random_j].hastime == true){
+        while(maze[random_i][random_j].hasbomb == true || maze[random_i][random_j].hastime == true){
             random_i = std::rand() % MAZEROWS;
             random_j = std::rand() % MAZECOLS;
         }
         maze[random_i][random_j].hastime = true;
     }
 }
-void Simulation::checkCoinTimeEat(){
+void Simulation::checkbombTimeEat(){
     std::pair<int, int> s_co = droid.getMazeCoordinates(maze[0][0].dstR);
-    updateCoinTime(droid, maze[s_co.first][s_co.second]);
-    updateCoinTime(droid, maze[s_co.first + 1][s_co.second]);
-    updateCoinTime(droid, maze[s_co.first - 1][s_co.second]);
-    updateCoinTime(droid, maze[s_co.first][s_co.second + 1]);
-    updateCoinTime(droid, maze[s_co.first][s_co.second - 1]);
+    updatebombTime(droid, maze[s_co.first][s_co.second]);
+    updatebombTime(droid, maze[s_co.first + 1][s_co.second]);
+    updatebombTime(droid, maze[s_co.first - 1][s_co.second]);
+    updatebombTime(droid, maze[s_co.first][s_co.second + 1]);
+    updatebombTime(droid, maze[s_co.first][s_co.second - 1]);
 }
 
 void MazeCell::incrementExplored(){
