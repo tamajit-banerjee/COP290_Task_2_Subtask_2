@@ -123,4 +123,7 @@ public:
 	std::vector<SDL_Rect> linesBacktrack;
 	SDL_Texture *forwardTex;
 	SDL_Texture *backTex;
+
+	int intorduce();
+	SDL_Texture *introTex;
 };

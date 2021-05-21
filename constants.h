@@ -3,6 +3,10 @@
 
 #include "stdbool.h"
 
+#define PLAYER_WIDTH_SRC 640
+#define PLAYER_HEIGHT_SRC 1020
+#define RENDER_PLAYER_DELAY 10
+
 #define PADDING_TOP 100
 #define PADDING_BOTTOM 0
 #define PADDING_RIGHT 100
@@ -22,8 +26,6 @@
 
 #define SPEED 2
 #define LEVELS 4
-
-#define MONSTERS 4
 
 #define SEPARATOR '|'
 #define FREEZE_LIMIT 20

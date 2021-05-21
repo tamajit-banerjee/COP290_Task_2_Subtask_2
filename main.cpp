@@ -38,6 +38,10 @@ int main(){
     Simulation *simulation = new Simulation();
     simulation->init(renderer, font);
 
+    if(simulation->intorduce() == -1)
+        return -1;
+
+
     char name[100];
     for(int i = 0; i<100; i++){name[i] = ' ';}
     simulation->droid.name = name;

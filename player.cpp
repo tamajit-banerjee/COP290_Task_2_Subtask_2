@@ -1,9 +1,5 @@
 #include "simulation.h"
 
-#define PLAYER_WIDTH_SRC 48
-#define PLAYER_HEIGHT_SRC 72
-#define RENDER_PLAYER_DELAY 10
-
 Player::Player(){
     name = "Not Entered yet!";
     xpos = 0, ypos = 0;
@@ -12,7 +8,7 @@ Player::Player(){
     time = 500;
     right = 0, left = 0, up = 0, down = 0;
     width = 32; height = 48;
-    playerId = 1;
+    playerId = 0;
     renderCycle = 1;
     player_no = 1;
     changeDirCounter = 0;
@@ -68,16 +64,16 @@ void Player::draw(SDL_Renderer *renderer, TTF_Font *font){
     if(xpos > old_xpos)
         srcR.y = 2*PLAYER_HEIGHT_SRC;
     else if(xpos < old_xpos)
-        srcR.y = 1*PLAYER_HEIGHT_SRC;
-    else if(ypos < old_ypos)
         srcR.y = 3*PLAYER_HEIGHT_SRC;
+    else if(ypos < old_ypos)
+        srcR.y = 1*PLAYER_HEIGHT_SRC;
     else if(ypos > old_ypos)
         srcR.y = 0;
     else{
         srcR.y = 0;
         renderCycle = 0;
     }
-    srcR.x = (3*playerId + int(renderCycle/RENDER_PLAYER_DELAY)) * PLAYER_WIDTH_SRC;
+    srcR.x = (int(renderCycle/RENDER_PLAYER_DELAY)) * PLAYER_WIDTH_SRC;
 
     // SDL_RenderCopy(renderer, Tex,  srcR, &destR);
     if(SDL_RenderCopyEx(renderer, Tex,  &srcR, &destR, 0.0, NULL, SDL_FLIP_NONE) < 0){
@@ -190,21 +186,21 @@ void Simulation::updateDroid(){
     std::pair<int, int> i_j = droid.getMazeCoordinates(maze[0][0].dstR);
     if(centre()){
         
-        // if(droid.changeDirCounter <= 0){
-        //     if(rand()%10 < 2)
-        //         droid.changeDirCounter = 0 ;
-        //     else 
-        //         droid.changeDirCounter = CHANGE_DIR_TIME;
+        if(droid.changeDirCounter <= 0){
+            if(rand()%10 < 2)
+                droid.changeDirCounter = 0 ;
+            else 
+                droid.changeDirCounter = CHANGE_DIR_TIME;
             
             
-        //     srand(simulationTime);
-        //     droid.dest =  rand()%(MAZECOLS * MAZEROWS);
-        //     while (distSquare(droid.dest, i_j) < 48 && maze[droid.dest/MAZECOLS][droid.dest%MAZECOLS].explored)
-        //         droid.dest =  rand()%(MAZECOLS * MAZEROWS);
-        // }
-        // else{
-        //     droid.changeDirCounter -- ;
-        // }
+            srand(simulationTime);
+            droid.dest =  rand()%(MAZECOLS * MAZEROWS);
+            while (distSquare(droid.dest, i_j) < 48 && maze[droid.dest/MAZECOLS][droid.dest%MAZECOLS].explored)
+                droid.dest =  rand()%(MAZECOLS * MAZEROWS);
+        }
+        else{
+            droid.changeDirCounter -- ;
+        }
 
 
         droid.left = 0;
