@@ -116,6 +116,7 @@ public:
 	void maze_dist_update();
 	bool centre();
 	void updateDroid();
+	void random_wall_removal();
 
 	Simulation(){}
 	~Simulation(){}

@@ -147,6 +147,63 @@ bool Simulation::union_sets(int a, int b) {
         return false;
 }
 
+
+
+void Simulation:: random_wall_removal(){
+
+    //srand( seedi + level );
+
+      std::pair<int,int> dir[] = {std::make_pair(0,-1),std::make_pair(0,1),std::make_pair(-1,0),std::make_pair(1,0)};
+
+    int i = rand()%MAZEROWS;
+    int j = rand()%MAZECOLS;
+    std::vector<int> store;
+    for(int k=0;k<4;k++)
+    if(ok(i+dir[k].first,j+dir[k].second) && (((maze[i][j].id)>>k)%2 == 1)  )
+        store.push_back(k);
+
+    while( store.size() == 0){
+        std::cout<<"rep\n";
+    i = rand()%MAZEROWS;
+    j = rand()%MAZECOLS;
+
+    for(int k=0;k<4;k++)
+    if(ok(i+dir[k].first,j+dir[k].second) && (((maze[i][j].id)>>k)%2 == 1)  )
+        store.push_back(k);
+    
+    }
+
+    int x = i;
+    int y = j;
+
+    std::shuffle(store.begin(),store.end(),std::default_random_engine(rand()));
+
+    int rom = store[0];
+
+            switch (rom) {
+                case 2:
+                    maze[x][y].removeWall("top");
+                    maze[x+dir[rom].first][y+dir[rom].second].removeWall("bottom");
+                    break;
+                case 3:
+                    maze[x][y].removeWall("bottom");
+                    maze[x+dir[rom].first][y+dir[rom].second].removeWall("top");
+                    break;
+                case 1:
+                    maze[x][y].removeWall("right");
+                    maze[x+dir[rom].first][y+dir[rom].second].removeWall("left");
+                    break;
+                case 0:
+                    maze[x][y].removeWall("left");
+                    maze[x+dir[rom].first][y+dir[rom].second].removeWall("right");
+                    break;
+                default:
+                    break;
+        }
+
+}
+ 
+
 void Simulation:: maze_gen(){
 
     std::pair<int,int> dir[] = {std::make_pair(1,0),std::make_pair(-1,0),std::make_pair(0,1),std::make_pair(0,-1)};

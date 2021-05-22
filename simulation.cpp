@@ -27,6 +27,9 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     simulationTime = 0;
     mazeInit();
     maze_gen();
+    for(int i=0;i<30;i++){
+        random_wall_removal();
+    }
     maze_dist_update();
     droid.time = 10000;
     droid.final_freeze = false;
