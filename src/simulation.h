@@ -136,4 +136,6 @@ public:
 
 	int start_pos;
 	int algorithm_type;
+	int total_price, total_cost;
+	void DisplayInfo();
 };

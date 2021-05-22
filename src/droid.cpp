@@ -249,7 +249,7 @@ std::vector<int> Simulation::TSP_Dynamic_Prog( int n, int *price , std::vector<s
 
     for(int pos = 0;pos<n;pos++){
         if(  mask & (1<<pos)   ){
-            if( dp_cost[mask][pos] + cost[pos][n] <= 100){
+            if( dp_cost[mask][pos] + cost[pos][n] <= BUDGET){
                 if(answer < tot_cost ){
                     path.clear();
                     answer = tot_cost;
@@ -330,7 +330,7 @@ std::vector<int> Simulation::CCTSP_Heuristic( int n, int *v , std::vector<std::v
             //     std::cout<<mapping[path[k]]<<"\n";
             // }
 
-            if( tot_time + cost[cur][left[i]] + cost[left[i]][n] <= 1000){
+            if( tot_time + cost[cur][left[i]] + cost[left[i]][n] <= BUDGET){
                 tot_time = tot_time + cost[cur][left[i]];
                 used[left[i]] = true;
                 int start = mapping[cur];
@@ -536,7 +536,9 @@ void Simulation::updateDroid(){
     if(centre()){
         // std::cout<<droid.dest <<" "<<path_counter<<"\n";
         // std::cout<<"musti"<<i_j.first <<" "<<i_j.second<<"\n";
+        
         if(path_counter==0 || (i_j.first == droid.dest/MAZECOLS && i_j.second == droid.dest% MAZECOLS )) {
+            sleep(2);
             ++path_counter;
             path_counter = (path_counter%simulation_path.size());
             droid.dest = simulation_path[path_counter];

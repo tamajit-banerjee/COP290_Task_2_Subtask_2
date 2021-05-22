@@ -40,7 +40,7 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     int price[n],m[n+1];
 
     for(int i=0;i<n;i++){
-        price[i] = rand()%1000;
+        price[i] = rand()%PRICE_LIMIT;
     }
 
     bool used[MAZECOLS*MAZEROWS] = {false};
@@ -71,10 +71,20 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     
 
     calc_path(n,price,cost,m);
+    
+    for(int i = 1; i<simulation_path.size(); i++){
+        int loc = simulation_path[i];
+        for(int j =0; j<n; j++){
+            if(m[j] == loc){
+                total_price += price[j];
+            }
+        }
+    }
 
     path_counter = 0 ;
     droid.dest = start_pos;
 
+    DisplayInfo();
     placebombs(m,n);
 }
 
@@ -129,6 +139,7 @@ void Simulation::render(){
 
     SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
 
+
     SDL_RenderPresent(renderer);
 }
 
@@ -175,17 +186,32 @@ void Simulation::loadTexture(char *textName, char *path){
     
 }
 
-// void Simulation::DisplayInfo(){
-//     std::pair<int, int> i_j = droid.getMazeCoordinates(maze[0][0].dstR);
-//     const char* c = "Droid current Location: row: ";
-//     char* c1 = ;
-//     const char* last = " for a game ";
-//     char* full_text;
-//     full_text=static_cast<char *>(malloc(strlen(c)+strlen(last)+strlen(cname)));
-//     strcpy(full_text,c);
-//     strcat(full_text,cname);
-//     strcat(full_text,last);
-// }
+void Simulation::DisplayInfo(){
+    // char* cost = "The total Price Obtained is: ";
+    // char intToChar[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    // int cost_temp = total_cost;
+    
+    // int counter = 0;
+    // while(cost_temp)
+    // {
+    //     cost_temp/=10;
+    //     ++counter;
+    // }
+    // char cost_val[counter];
+    // cost_temp = total_cost;
+    // while(cost_temp>0){
+    //     cost_val[counter - 1] = intToChar[cost_temp%10];
+    //     cost_temp= cost_temp / 10;
+    //     counter -- ;
+    // }
+    // char* full_text;
+    // full_text=static_cast<char *>(malloc(strlen(cost)+strlen(cost_val)));
+    // strcat(full_text,cost);
+    // strcat(full_text,cost_val);
+    // disp_text_center(renderer, full_text , font, int(SCREEN_WIDTH/2 + PADDING_LEFT + 100), int(SCREEN_HEIGHT/2) + 300);
+    // std::cout<<"The total cost is: "<<total_cost<<'\n';
+    std::cout<<"The total price is: "<<total_price<<'\n';
+}
 
 
 int Simulation::intorduce(){

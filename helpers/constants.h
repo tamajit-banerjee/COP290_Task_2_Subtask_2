@@ -3,6 +3,10 @@
 
 #include "stdbool.h"
 
+
+#define BUDGET 40
+#define PRICE_LIMIT 2000
+
 #define droid_WIDTH_SRC 640
 #define droid_HEIGHT_SRC 1020
 #define RENDER_droid_DELAY 10
