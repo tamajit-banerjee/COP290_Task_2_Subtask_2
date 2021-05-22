@@ -1,26 +1,33 @@
-#include "Header.h"
-#include "constants.h"
-#include "font.hpp"
-#include "menu.hpp"
-#include "simulation.h"
+#include "helpers/Header.h"
+#include "helpers/constants.h"
+#include "helpers/font.hpp"
+#include "helpers/menu.hpp"
+#include "src/simulation.h"
 
 int main(int argc, char **argv){
-    int algorithm_type;
+    int algorithm_type = 0;
     if (argc == 1)
         algorithm_type = 0;
-    else{
+    else if(argc == 2){
         algorithm_type = std::stoi(argv[1]);
     }
-    
+
     // char menu = 's';
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
     TTF_Font *font;
+    char* windowName;
+    if(algorithm_type == 0){
+        windowName = "Dynamic Programming Based";
+    }
+    else{
+        windowName = "Heuristics Based";
+    }
     font = TTF_OpenFont("resources/m5x7.ttf", 24);
     window = SDL_CreateWindow(
-            "simulation",
+            windowName,
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             SCREEN_WIDTH + PADDING_RIGHT + PADDING_LEFT,
@@ -43,8 +50,9 @@ int main(int argc, char **argv){
     }
 
     Simulation *simulation = new Simulation();
-    simulation->init(renderer, font);
     simulation->algorithm_type = algorithm_type;
+    simulation->init(renderer, font);
+    
 
     if(simulation->intorduce() == -1)
         return -1;

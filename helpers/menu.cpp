@@ -1,5 +1,4 @@
 #include "menu.hpp"
-#include "simulation.h"
 
 
 void server_or_client(SDL_Renderer *renderer, char *menu, TTF_Font *font){

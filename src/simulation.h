@@ -3,10 +3,10 @@
 #include <chrono>
 #include <thread>
 
-#include "Header.h"
-#include "constants.h"
-#include "font.hpp"
-#include "menu.hpp"
+#include "../helpers/Header.h"
+#include "../helpers/constants.h"
+#include "../helpers/font.hpp"
+#include "../helpers/menu.hpp"
 
 class Droid{
 public:

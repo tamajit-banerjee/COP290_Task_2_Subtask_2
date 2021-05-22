@@ -191,7 +191,7 @@ void Simulation::calc_path(  int n, int *price , std::vector<std::vector<int> > 
         path = CCTSP_Heuristic(n, price, cost, mapping);
     }
         simulation_path.clear();
-        for(int i=1;i<path.size();i++){
+        for(int i=0;i<path.size();i++){
             simulation_path.push_back(mapping[path[i]]);
         }
 
@@ -537,9 +537,9 @@ void Simulation::updateDroid(){
         // std::cout<<droid.dest <<" "<<path_counter<<"\n";
         // std::cout<<"musti"<<i_j.first <<" "<<i_j.second<<"\n";
         if(path_counter==0 || (i_j.first == droid.dest/MAZECOLS && i_j.second == droid.dest% MAZECOLS )) {
-            droid.dest = simulation_path[path_counter];
             ++path_counter;
             path_counter = (path_counter%simulation_path.size());
+            droid.dest = simulation_path[path_counter];
             // std::cout<<"dest modified\n";
         }
 
@@ -547,6 +547,8 @@ void Simulation::updateDroid(){
         droid.right = 0;
         droid.up = 0;
         droid.down = 0;
+        if(i_j.first * MAZECOLS + i_j.second == droid.dest)
+            return;
         int direction = maze[i_j.first][i_j.second].to_go[droid.dest];
 
         switch(direction){
@@ -558,6 +560,8 @@ void Simulation::updateDroid(){
                 droid.up = 1; break;
             case 3:
                 droid.down = 1; break;
+            default:
+                break;
         }
 
     }

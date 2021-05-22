@@ -33,8 +33,8 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     maze_dist_update();
     droid.time = 10000;
     droid.final_freeze = false;
-    srand(std::chrono::system_clock::now().time_since_epoch().count());
-    start_pos = rand()%(MAZECOLS*MAZEROWS);
+    srand(3);
+    start_pos = MAZECOLS + 1;
     droid.setPosCenter(start_pos/MAZECOLS,start_pos%MAZECOLS);
     int n = 10;
     int price[n],m[n+1];
@@ -69,11 +69,11 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
         cost.push_back(temp);
     }
     
-    algorithm_type = 0;
+
     calc_path(n,price,cost,m);
 
     path_counter = 0 ;
-    droid.dest = simulation_path[0];
+    droid.dest = start_pos;
 
     placebombs(m,n);
 }
@@ -191,7 +191,7 @@ void Simulation::loadTexture(char *textName, char *path){
 int Simulation::intorduce(){
     int helloCounter = 0;
     while(true){
-        char* c = "Welcome to Robo Bomb Defuser simulation!";
+        char* c = "Welcome to DefusoBot simulation!";
         char* c2 = "Press Enter to start";
 
         SDL_Rect srcR, dstR;
