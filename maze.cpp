@@ -505,43 +505,18 @@ bool isOnPower(int x, int y, int w, int h, SDL_Rect & rect){
         return false;
 }
 
-bool playerOnbomb(Player & p, MazeCell & m){
+bool droidOnbomb(Droid & p, MazeCell & m){
     // std::cout<<m.hasbomb<<isOnbomb(p.xpos, p.ypos, p.width, p.height, m.dstR);
     if(m.hasbomb && isOnPower(p.xpos, p.ypos, p.width, p.height, m.dstR)){
         m.hasbomb = false;
-        p.score += bomb_SCORE;
-        return true;
-    }
-    return false;
-}
-bool playerOnTime(Player & p, MazeCell & m){
-    // std::cout<<m.hasbomb<<isOnbomb(p.xpos, p.ypos, p.width, p.height, m.dstR);
-    if(m.hastime && isOnPower(p.xpos, p.ypos, p.width, p.height, m.dstR)){
-        m.hastime = false;
         return true;
     }
     return false;
 }
 
-void Simulation::updatebombTime(Player & p, MazeCell & m){
-    int random_i = std::rand() % MAZEROWS;
-    int random_j = std::rand() % MAZECOLS;
-    if(playerOnbomb(p, m)){
-        // while(maze[random_i][random_j].hasbomb == true || maze[random_i][random_j].hastime == true){
-        //     random_i = std::rand() % MAZEROWS;
-        //     random_j = std::rand() % MAZECOLS;
-        // }
-        // maze[random_i][random_j].hasbomb = true;
-    }
-    // random_i = std::rand() % MAZEROWS;
-    // random_j = std::rand() % MAZECOLS;
-    // if(playerOnTime(p, m)){
-    //     while(maze[random_i][random_j].hasbomb == true || maze[random_i][random_j].hastime == true){
-    //         random_i = std::rand() % MAZEROWS;
-    //         random_j = std::rand() % MAZECOLS;
-    //     }
-    //     maze[random_i][random_j].hastime = true;
-    // }
+void Simulation::updatebombTime(Droid & p, MazeCell & m){
+   
+    droidOnbomb(p, m);
 }
 
 

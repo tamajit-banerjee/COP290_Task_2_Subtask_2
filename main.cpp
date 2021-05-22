@@ -4,7 +4,14 @@
 #include "menu.hpp"
 #include "simulation.h"
 
-int main(){
+int main(int argc, char **argv){
+    int algorithm_type;
+    if (argc == 1)
+        algorithm_type = 0;
+    else{
+        algorithm_type = std::stoi(argv[1]);
+    }
+    
     // char menu = 's';
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -37,6 +44,7 @@ int main(){
 
     Simulation *simulation = new Simulation();
     simulation->init(renderer, font);
+    simulation->algorithm_type = algorithm_type;
 
     if(simulation->intorduce() == -1)
         return -1;

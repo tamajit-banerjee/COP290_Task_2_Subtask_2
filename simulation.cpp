@@ -8,7 +8,7 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
 
     isRunning = true;
 
-    loadTexture("player", "resources/droid.bmp");
+    loadTexture("droid", "resources/droid.bmp");
     loadTexture("maze", "resources/maze.bmp");
     loadTexture("bomb", "resources/bomb.bmp");
     
@@ -17,8 +17,8 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     loadTexture("intro", "resources/droid_intro.bmp");
     loadTexture("destination", "resources/destination.bmp");
 
-    droid.playerId = 1;
-    droid.player_no = 1;
+    droid.droidId = 1;
+    droid.droid_no = 1;
 
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -33,47 +33,49 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     maze_dist_update();
     droid.time = 10000;
     droid.final_freeze = false;
+    srand(std::chrono::system_clock::now().time_since_epoch().count());
+    start_pos = rand()%(MAZECOLS*MAZEROWS);
+    droid.setPosCenter(start_pos/MAZECOLS,start_pos%MAZECOLS);
     int n = 10;
-        int price[n],m[n+1];
+    int price[n],m[n+1];
 
-        for(int i=0;i<n;i++){
-            price[i] = rand()%1000;
-        }
+    for(int i=0;i<n;i++){
+        price[i] = rand()%1000;
+    }
 
-        bool used[MAZECOLS*MAZEROWS] = {false};
-        used[MAZECOLS+1] = true;
-        for(int i=0;i<n;i++){
-            int temp = rand()%(MAZECOLS*MAZEROWS);
-            while(used[temp])
-                temp = rand()%(MAZECOLS*MAZEROWS);
-            m[i] =temp;
-           std::cout<<temp<<"\n";
-            used[temp] =true;
-        }
-        //std::cout<<"\n";
-        m[n] = MAZECOLS+1;
-        std::vector<std::vector<int> > cost;
-        for(int i=0;i<=n;i++){
-            std::vector<int> temp;
-                int row = m[i]/MAZECOLS;
-                int col = m[i]%MAZECOLS;
-            for(int j=0;j<=n;j++){
-                if(i==j){
-                    temp.push_back(0);
-                }else{
+    bool used[MAZECOLS*MAZEROWS] = {false};
+    used[start_pos] = true;
+    for(int i=0;i<n;i++){
+        int temp = rand()%(MAZECOLS*MAZEROWS);
+        while(used[temp])
+            temp = rand()%(MAZECOLS*MAZEROWS);
+        m[i] =temp;
+        // std::cout<<temp<<"\n";
+        used[temp] =true;
+    }
+    m[n] = start_pos;
+    std::vector<std::vector<int> > cost;
+    for(int i=0;i<=n;i++){
+        std::vector<int> temp;
+            int row = m[i]/MAZECOLS;
+            int col = m[i]%MAZECOLS;
+        for(int j=0;j<=n;j++){
+            if(i==j){
+                temp.push_back(0);
+            }else{
                 temp.push_back(maze[row][col].to_go_dist[m[j]]);
-                }
             }
-            cost.push_back(temp);
         }
+        cost.push_back(temp);
+    }
+    
+    algorithm_type = 0;
     calc_path(n,price,cost,m);
-    path_counter = 0 ;
 
-    droid.setPosCenter(1,1);
-    droid.dest=MAZECOLS+1;
+    path_counter = 0 ;
+    droid.dest = simulation_path[0];
+
     placebombs(m,n);
-    // droid.setPosCenter(1, 1);
-    //droid.dest = (MAZEROWS)*(MAZECOLS);
 }
 
 void Simulation::handleEvents()
@@ -103,10 +105,6 @@ void Simulation::update(){
 
     simulationTime++;
 
-    // std::pair<int, int> s_p = droid.move(SPEED); 
-    // if(!checkWallCollisions(s_p.first, s_p.second, droid.width, droid.height)){
-    //     droid.xpos = s_p.first; droid.ypos = s_p.second;
-    // }
     if(centre()){
         addLines();
     }
@@ -139,7 +137,7 @@ void Simulation::render(){
 
 void Simulation::loadTexture(char *textName, char *path){
     SDL_Surface* tmpSurface;
-    if(strcmp(textName, "player") == 0){
+    if(strcmp(textName, "droid") == 0){
         tmpSurface = SDL_LoadBMP(path);
         droid.Tex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
         SDL_FreeSurface(tmpSurface);
@@ -198,9 +196,9 @@ int Simulation::intorduce(){
 
         SDL_Rect srcR, dstR;
         dstR.h = 200; dstR.w = 125;
-        dstR.x = int(SCREEN_WIDTH/2) - 62 + PADDING_LEFT; dstR.y = int(SCREEN_HEIGHT/3 - 100) + PADDING_TOP;
-        srcR.h = PLAYER_HEIGHT_SRC; srcR.w = PLAYER_WIDTH_SRC;
-        srcR.y = 0; srcR.x = (int(helloCounter/10)%5)*PLAYER_WIDTH_SRC;
+        dstR.x = int(SCREEN_WIDTH/2) - 62 + PADDING_LEFT; dstR.y = int(SCREEN_HEIGHT/3) + PADDING_TOP;
+        srcR.h = droid_HEIGHT_SRC; srcR.w = droid_WIDTH_SRC;
+        srcR.y = 0; srcR.x = (int(helloCounter/10)%5)*droid_WIDTH_SRC;
 
         
 
@@ -210,8 +208,8 @@ int Simulation::intorduce(){
             std::cout<<SDL_GetError()<<"\n";
             exit(EXIT_FAILURE);
         }
-        disp_text_center(renderer, c , font, int(SCREEN_WIDTH/2 + PADDING_LEFT), int(SCREEN_HEIGHT/2) + 20);
-        disp_text_center(renderer, c2 , font, int(SCREEN_WIDTH/2 + PADDING_LEFT), int(SCREEN_HEIGHT/2) + 60);
+        disp_text_center(renderer, c , font, int(SCREEN_WIDTH/2 + PADDING_LEFT), int(SCREEN_HEIGHT/2) + 120);
+        disp_text_center(renderer, c2 , font, int(SCREEN_WIDTH/2 + PADDING_LEFT), int(SCREEN_HEIGHT/2) + 160);
         SDL_RenderPresent(renderer);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(20));

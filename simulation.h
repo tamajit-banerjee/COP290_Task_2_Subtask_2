@@ -8,10 +8,10 @@
 #include "font.hpp"
 #include "menu.hpp"
 
-class Player{
+class Droid{
 public:
 	char* name;
-	int player_no;
+	int droid_no;
 	int score;
 	int time;
 	int xpos, ypos, old_xpos, old_ypos;
@@ -20,15 +20,15 @@ public:
 	void setPosCenter(int i, int j);
 
 	SDL_Texture *Tex;
-	int playerId;
+	int droidId;
 	int renderCycle;
 
 	bool freeze;
     bool final_freeze;
 	int freeze_counter;
 
-	Player();
-	Player(const Player &p);
+	Droid();
+	Droid(const Droid &p);
 	int dest;
 
     void encode(int x[]);
@@ -88,7 +88,7 @@ public:
 	int path_counter;
 	bool isRunning;
 
-	Player droid;
+	Droid droid;
 	void updateVisibility();
 
 	void renderMaze();
@@ -108,7 +108,7 @@ public:
 	int bombCycle, timeCycle;
 	void placebombs(int mapping[], int n);
 	void checkbombTimeEat();
-	void updatebombTime(Player & p, MazeCell & m);
+	void updatebombTime(Droid & p, MazeCell & m);
 	std::vector<int> TSP_Dynamic_Prog( int n, int *price , std::vector<std::vector<int> > cost);
 	std::vector<int> CCTSP_Heuristic( int n, int *v , std::vector<std::vector<int> > cost , int * mapping );
 	void calc_path(  int n, int *price , std::vector<std::vector<int> > cost , int * mapping  );
@@ -133,4 +133,7 @@ public:
 	int intorduce();
 	SDL_Texture *introTex;
 	SDL_Texture *destTex;
+
+	int start_pos;
+	int algorithm_type;
 };

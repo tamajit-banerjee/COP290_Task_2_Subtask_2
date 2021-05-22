@@ -3,9 +3,9 @@
 
 #include "stdbool.h"
 
-#define PLAYER_WIDTH_SRC 640
-#define PLAYER_HEIGHT_SRC 1020
-#define RENDER_PLAYER_DELAY 10
+#define droid_WIDTH_SRC 640
+#define droid_HEIGHT_SRC 1020
+#define RENDER_droid_DELAY 10
 
 #define PADDING_TOP 0
 #define PADDING_BOTTOM 0

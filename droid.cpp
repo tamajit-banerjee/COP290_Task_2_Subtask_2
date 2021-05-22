@@ -1,6 +1,6 @@
 #include "simulation.h"
 
-Player::Player(){
+Droid::Droid(){
     name = "Not Entered yet!";
     xpos = 0, ypos = 0;
     old_xpos = 0, old_ypos = 0;
@@ -8,35 +8,35 @@ Player::Player(){
     time = 500;
     right = 0, left = 0, up = 0, down = 0;
     width = 32; height = 48;
-    playerId = 0;
+    droidId = 0;
     renderCycle = 1;
-    player_no = 1;
+    droid_no = 1;
     changeDirCounter = 0;
     last_i = -1; last_j = -1;
     isBackTracking = false;
 }
 
 
-Player::Player(const Player &p){
+Droid::Droid(const Droid &p){
     name = p.name;
     xpos = p.xpos, ypos = p.ypos;
     score = p.score;
     time = p.time;
     right = 0, left = 0, up = 0, down = 0;
     width = p.width, height = p.height;
-    playerId = p.playerId;
+    droidId = p.droidId;
     renderCycle = p.renderCycle;
-    player_no = p.player_no;
+    droid_no = p.droid_no;
 }
 
-void Player::encode(int x[]){
+void Droid::encode(int x[]){
     x[0] = xpos;
     x[1] = ypos;
     x[2] = score;
     x[3] = time;
 }
 
-void Player::decode(int y[]){
+void Droid::decode(int y[]){
     old_xpos = xpos;
     old_ypos = ypos;
     xpos = y[0];
@@ -45,12 +45,12 @@ void Player::decode(int y[]){
     time = y[3];
 }
 
-void Player::setPosCenter(int i, int j){
+void Droid::setPosCenter(int i, int j){
     xpos = i*CELL_SIZE + CELL_SIZE/2 - width/2;
     ypos = j*CELL_SIZE + CELL_SIZE/2 - height/2;
 }
 
-void Player::draw(SDL_Renderer *renderer, TTF_Font *font){
+void Droid::draw(SDL_Renderer *renderer, TTF_Font *font){
     SDL_Rect destR;
     destR.h = height;
     destR.w = width;
@@ -58,48 +58,48 @@ void Player::draw(SDL_Renderer *renderer, TTF_Font *font){
     destR.y = ypos + PADDING_TOP;
 
     SDL_Rect srcR;
-    srcR.h = PLAYER_HEIGHT_SRC;
-    srcR.w = PLAYER_WIDTH_SRC;
+    srcR.h = droid_HEIGHT_SRC;
+    srcR.w = droid_WIDTH_SRC;
     
     if(xpos > old_xpos)
-        srcR.y = 2*PLAYER_HEIGHT_SRC;
+        srcR.y = 2*droid_HEIGHT_SRC;
     else if(xpos < old_xpos)
-        srcR.y = 3*PLAYER_HEIGHT_SRC;
+        srcR.y = 3*droid_HEIGHT_SRC;
     else if(ypos < old_ypos)
-        srcR.y = 1*PLAYER_HEIGHT_SRC;
+        srcR.y = 1*droid_HEIGHT_SRC;
     else if(ypos > old_ypos)
         srcR.y = 0;
     else{
         srcR.y = 0;
         renderCycle = 0;
     }
-    srcR.x = (int(renderCycle/RENDER_PLAYER_DELAY)) * PLAYER_WIDTH_SRC;
+    srcR.x = (int(renderCycle/RENDER_droid_DELAY)) * droid_WIDTH_SRC;
 
     // SDL_RenderCopy(renderer, Tex,  srcR, &destR);
     if(SDL_RenderCopyEx(renderer, Tex,  &srcR, &destR, 0.0, NULL, SDL_FLIP_NONE) < 0){
-        std::cout<<"Players not rendered properly\n";
+        std::cout<<"droids not rendered properly\n";
         std::cout<<SDL_GetError()<<"\n";
         exit(EXIT_FAILURE);
     }
-    renderCycle = (renderCycle+1)%(3*RENDER_PLAYER_DELAY) ;
+    renderCycle = (renderCycle+1)%(3*RENDER_droid_DELAY) ;
 }
 
-void Player::dispName(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos){
+void Droid::dispName(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos){
     disp_text(renderer, name, font, xpos, ypos);
 }
-void Player::dispScore(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos){
+void Droid::dispScore(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos){
     disp_text(renderer, "Score: ", font, xpos, ypos);
     std::string temp_str = std::to_string(score);
     char* char_type = (char*) temp_str.c_str();
     disp_text(renderer, char_type, font, xpos+50, ypos);
 }
-void Player::dispTime(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos){
+void Droid::dispTime(SDL_Renderer *renderer, TTF_Font *font, int xpos, int ypos){
     disp_text(renderer, "Time: ", font, xpos, ypos);
     std::string temp_str = std::to_string(time);
     char* char_type = (char*) temp_str.c_str();
     disp_text(renderer, char_type, font, xpos+50, ypos);
 }
-std::pair<int,int> Player::move(int s){
+std::pair<int,int> Droid::move(int s){
     old_xpos = xpos, old_ypos = ypos;
     int new_x = xpos, new_y = ypos;
     // std::cout<<xpos<<" "<<left<<'\n';
@@ -114,7 +114,7 @@ std::pair<int,int> Player::move(int s){
     return std::make_pair(new_x, new_y);
 }
 
-void Player::handleKeyDown(int key){
+void Droid::handleKeyDown(int key){
     switch(key){
         case SDLK_LEFT:
             left = 1;
@@ -132,7 +132,7 @@ void Player::handleKeyDown(int key){
             break;
     }
 }
-void Player::handleKeyUp(int key){
+void Droid::handleKeyUp(int key){
     switch(key){
         case SDLK_LEFT:
             left = 0;
@@ -151,7 +151,7 @@ void Player::handleKeyUp(int key){
     }
 }
 
-std::pair<int, int> Player::getMazeCoordinates(SDL_Rect &r){
+std::pair<int, int> Droid::getMazeCoordinates(SDL_Rect &r){
     int i = 0;
     int j = 0;
     while(i<MAZEROWS){
@@ -183,15 +183,16 @@ int distSquare(int ran, std::pair<int, int> i_j){
 }
 
 void Simulation::calc_path(  int n, int *price , std::vector<std::vector<int> > cost , int * mapping  ){
-
-        //std::cout<<"hi\n";
-
-    //  std::vector<int> path = TSP_Dynamic_Prog(n,price,cost);
-    std::vector<int> path = CCTSP_Heuristic( n, price , cost , mapping  );
+    std::vector<int> path;
+    if(algorithm_type == 0){
+        path = TSP_Dynamic_Prog(n, price, cost);
+    }
+    else{
+        path = CCTSP_Heuristic(n, price, cost, mapping);
+    }
         simulation_path.clear();
-        for(int i=0;i<path.size();i++){
+        for(int i=1;i<path.size();i++){
             simulation_path.push_back(mapping[path[i]]);
-         //   std::cout<<m[path[i]]<<"\n";
         }
 
 }
@@ -302,7 +303,7 @@ std::vector<int> Simulation::CCTSP_Heuristic( int n, int *v , std::vector<std::v
   while(num < n ){
 
       //std::cout<<num<<"\n";
-        int start = mapping[cur];
+        // int start = mapping[cur];
 
         std::vector<int> left;
 
@@ -533,12 +534,13 @@ void Simulation::updateDroid(){
     std::pair<int, int> i_j = droid.getMazeCoordinates(rect);
     //std::cout<<i_j.first <<" "<<i_j.second<<"\n";
     if(centre()){
-        // std::cout<<droid.xpos <<" "<<droid.ypos<<"\n";
+        // std::cout<<droid.dest <<" "<<path_counter<<"\n";
         // std::cout<<"musti"<<i_j.first <<" "<<i_j.second<<"\n";
-        if(i_j.first == droid.dest/MAZECOLS && i_j.second == droid.dest% MAZECOLS ) {
+        if(path_counter==0 || (i_j.first == droid.dest/MAZECOLS && i_j.second == droid.dest% MAZECOLS )) {
+            droid.dest = simulation_path[path_counter];
             ++path_counter;
             path_counter = (path_counter%simulation_path.size());
-            droid.dest = simulation_path[path_counter];
+            // std::cout<<"dest modified\n";
         }
 
         droid.left = 0;
