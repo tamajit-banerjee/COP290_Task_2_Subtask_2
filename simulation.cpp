@@ -33,11 +33,45 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     maze_dist_update();
     droid.time = 10000;
     droid.final_freeze = false;
-    calc_path(5);
+    int n = 10;
+        int price[n],m[n+1];
+
+        for(int i=0;i<n;i++){
+            price[i] = rand()%1000;
+        }
+
+        bool used[MAZECOLS*MAZEROWS] = {false};
+        used[MAZECOLS+1] = true;
+        for(int i=0;i<n;i++){
+            int temp = rand()%(MAZECOLS*MAZEROWS);
+            while(used[temp])
+                temp = rand()%(MAZECOLS*MAZEROWS);
+            m[i] =temp;
+           std::cout<<temp<<"\n";
+            used[temp] =true;
+        }
+        //std::cout<<"\n";
+        m[n] = MAZECOLS+1;
+        std::vector<std::vector<int> > cost;
+        for(int i=0;i<=n;i++){
+            std::vector<int> temp;
+                int row = m[i]/MAZECOLS;
+                int col = m[i]%MAZECOLS;
+            for(int j=0;j<=n;j++){
+                if(i==j){
+                    temp.push_back(0);
+                }else{
+                temp.push_back(maze[row][col].to_go_dist[m[j]]);
+                }
+            }
+            cost.push_back(temp);
+        }
+    calc_path(n,price,cost,m);
     path_counter = 0 ;
 
     droid.setPosCenter(1,1);
     droid.dest=MAZECOLS+1;
+    placebombs(m,n);
     // droid.setPosCenter(1, 1);
     //droid.dest = (MAZEROWS)*(MAZECOLS);
 }

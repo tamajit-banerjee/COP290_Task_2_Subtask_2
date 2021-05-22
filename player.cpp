@@ -182,46 +182,15 @@ int distSquare(int ran, std::pair<int, int> i_j){
     return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
 }
 
-void Simulation::calc_path(int n){
+void Simulation::calc_path(  int n, int *price , std::vector<std::vector<int> > cost , int * mapping  ){
 
-        int price[n],m[n+1];
+        //std::cout<<"hi\n";
 
-        for(int i=0;i<n;i++){
-            price[i] = rand()%1000;
-        }
-
-        bool used[MAZECOLS*MAZEROWS] = {false};
-        used[MAZECOLS+1] = true;
-        for(int i=0;i<n;i++){
-            int temp = rand()%(MAZECOLS*MAZEROWS);
-            while(used[temp])
-                temp = rand()%(MAZECOLS*MAZEROWS);
-            m[i] =temp;
-           std::cout<<temp<<"\n";
-            used[temp] =true;
-        }
-        std::cout<<"\n";
-        m[n] = MAZECOLS+1;
-        std::vector<std::vector<int> > cost;
-        for(int i=0;i<=n;i++){
-            std::vector<int> temp;
-                int row = m[i]/MAZECOLS;
-                int col = m[i]%MAZECOLS;
-            for(int j=0;j<=n;j++){
-                if(i==j){
-                    temp.push_back(0);
-                }else{
-                temp.push_back(maze[row][col].to_go_dist[m[j]]);
-                }
-            }
-            cost.push_back(temp);
-        }
-        std::cout<<"hi\n";
-      std::vector<int> path = TSP_Dynamic_Prog(n,price,cost);
-    //std::vector<int> path = CCTSP_Heuristic( n, price , cost , m  );
+    //  std::vector<int> path = TSP_Dynamic_Prog(n,price,cost);
+    std::vector<int> path = CCTSP_Heuristic( n, price , cost , mapping  );
         simulation_path.clear();
         for(int i=0;i<path.size();i++){
-            simulation_path.push_back(m[path[i]]);
+            simulation_path.push_back(mapping[path[i]]);
          //   std::cout<<m[path[i]]<<"\n";
         }
 
@@ -330,13 +299,9 @@ std::vector<int> Simulation::CCTSP_Heuristic( int n, int *v , std::vector<std::v
   
   std::vector<int> path;
   path.push_back(cur);
-  int counter = 0;
   while(num < n ){
 
-      std::cout<<num<<"\n";
-      if(counter > 100 )
-        break;
-        ++counter;
+      //std::cout<<num<<"\n";
         int start = mapping[cur];
 
         std::vector<int> left;
@@ -358,11 +323,11 @@ std::vector<int> Simulation::CCTSP_Heuristic( int n, int *v , std::vector<std::v
 
         for(int i=0;i<left.size();i++){
 
-             std::cout<<"hello2\n";
+            //  std::cout<<"hello2\n";
 
-            for(int k=0;k<path.size();k++){
-                std::cout<<mapping[path[k]]<<"\n";
-            }
+            // for(int k=0;k<path.size();k++){
+            //     std::cout<<mapping[path[k]]<<"\n";
+            // }
 
             if( tot_time + cost[cur][left[i]] + cost[left[i]][n] <= 1000){
                 tot_time = tot_time + cost[cur][left[i]];
@@ -372,7 +337,7 @@ std::vector<int> Simulation::CCTSP_Heuristic( int n, int *v , std::vector<std::v
 
                 while(start != end ){
 
-                    std::cout<<start<<" "<<end<<"\n";
+                //    std::cout<<start<<" "<<end<<"\n";
 
 
                     int direction = maze[start/MAZECOLS][start%MAZECOLS].to_go[end];

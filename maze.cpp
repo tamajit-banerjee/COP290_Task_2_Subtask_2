@@ -163,7 +163,7 @@ void Simulation:: random_wall_removal(){
         store.push_back(k);
 
     while( store.size() == 0){
-        std::cout<<"rep\n";
+    //    std::cout<<"rep\n";
     i = rand()%MAZEROWS;
     j = rand()%MAZECOLS;
 
@@ -336,12 +336,12 @@ void Simulation::renderMaze(){
 
 }
 
-void Simulation::placebombs(){
-    maze[0][3].hasbomb = true;
-    maze[1][5].hasbomb = true;
-    maze[3][7].hasbomb = true;
-    maze[4][8].hasbomb = true;
-    maze[9][4].hasbomb = true;
+void Simulation::placebombs(int mapping[], int n){
+    for(int i=0;i<n;i++){
+        int row = mapping[i]/MAZECOLS;
+        int col = mapping[i]%MAZEROWS;
+        maze[row][col].hasbomb = true;
+    }
 }
 
 
@@ -356,7 +356,6 @@ void Simulation::mazeInit(){
         }
     }
     bombCycle = 0;
-    placebombs();
 }
 
 
@@ -528,22 +527,25 @@ void Simulation::updatebombTime(Player & p, MazeCell & m){
     int random_i = std::rand() % MAZEROWS;
     int random_j = std::rand() % MAZECOLS;
     if(playerOnbomb(p, m)){
-        while(maze[random_i][random_j].hasbomb == true || maze[random_i][random_j].hastime == true){
-            random_i = std::rand() % MAZEROWS;
-            random_j = std::rand() % MAZECOLS;
-        }
-        maze[random_i][random_j].hasbomb = true;
+        // while(maze[random_i][random_j].hasbomb == true || maze[random_i][random_j].hastime == true){
+        //     random_i = std::rand() % MAZEROWS;
+        //     random_j = std::rand() % MAZECOLS;
+        // }
+        // maze[random_i][random_j].hasbomb = true;
     }
-    random_i = std::rand() % MAZEROWS;
-    random_j = std::rand() % MAZECOLS;
-    if(playerOnTime(p, m)){
-        while(maze[random_i][random_j].hasbomb == true || maze[random_i][random_j].hastime == true){
-            random_i = std::rand() % MAZEROWS;
-            random_j = std::rand() % MAZECOLS;
-        }
-        maze[random_i][random_j].hastime = true;
-    }
+    // random_i = std::rand() % MAZEROWS;
+    // random_j = std::rand() % MAZECOLS;
+    // if(playerOnTime(p, m)){
+    //     while(maze[random_i][random_j].hasbomb == true || maze[random_i][random_j].hastime == true){
+    //         random_i = std::rand() % MAZEROWS;
+    //         random_j = std::rand() % MAZECOLS;
+    //     }
+    //     maze[random_i][random_j].hastime = true;
+    // }
 }
+
+
+
 void Simulation::checkbombTimeEat(){
     std::pair<int, int> s_co = droid.getMazeCoordinates(maze[0][0].dstR);
     updatebombTime(droid, maze[s_co.first][s_co.second]);
