@@ -549,7 +549,7 @@ void Simulation::updateDroid(){
         // std::cout<<droid.dest <<" "<<path_counter<<"\n";
         // std::cout<<"musti"<<i_j.first <<" "<<i_j.second<<"\n";
         
-        if(path_counter==0 || (i_j.first == droid.dest/MAZECOLS && i_j.second == droid.dest% MAZECOLS )) {
+        if((i_j.first == droid.dest/MAZECOLS && i_j.second == droid.dest% MAZECOLS )) {
            // sleep(2);
             ++path_counter;
             path_counter = (path_counter%simulation_path.size());

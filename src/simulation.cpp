@@ -3,6 +3,8 @@
 void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
 {
 
+    srand(17);
+
 	renderer = arg_renderer;
     font = arg_font;
 
@@ -33,7 +35,7 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     maze_dist_update();
     droid.time = 10000;
     droid.final_freeze = false;
-    srand(13);
+    
     start_pos = MAZECOLS + 1;
     droid.setPosCenter(start_pos/MAZECOLS,start_pos%MAZECOLS);
     int n = 10;
@@ -84,7 +86,6 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     path_counter = 0 ;
     droid.dest = start_pos;
 
-    DisplayInfo();
     placebombs(m,n);
 }
 
@@ -139,6 +140,8 @@ void Simulation::render(){
 
     SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
 
+    DisplayInfo();
+
 
     SDL_RenderPresent(renderer);
 }
@@ -187,30 +190,18 @@ void Simulation::loadTexture(char *textName, char *path){
 }
 
 void Simulation::DisplayInfo(){
-    // char* cost = "The total Price Obtained is: ";
-    // char intToChar[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    // int cost_temp = total_cost;
+    char* price = "The total Price Obtained is: ";
+    std::string price_val = std::to_string(total_price).c_str();
+    char *cstr = new char[price_val.length() + 1];
+    strcpy(cstr, price_val.c_str());
+    // do stuff
     
-    // int counter = 0;
-    // while(cost_temp)
-    // {
-    //     cost_temp/=10;
-    //     ++counter;
-    // }
-    // char cost_val[counter];
-    // cost_temp = total_cost;
-    // while(cost_temp>0){
-    //     cost_val[counter - 1] = intToChar[cost_temp%10];
-    //     cost_temp= cost_temp / 10;
-    //     counter -- ;
-    // }
-    // char* full_text;
-    // full_text=static_cast<char *>(malloc(strlen(cost)+strlen(cost_val)));
-    // strcat(full_text,cost);
-    // strcat(full_text,cost_val);
-    // disp_text_center(renderer, full_text , font, int(SCREEN_WIDTH/2 + PADDING_LEFT + 100), int(SCREEN_HEIGHT/2) + 300);
-    // std::cout<<"The total cost is: "<<total_cost<<'\n';
-    std::cout<<"The total price is: "<<total_price<<'\n';
+
+    disp_text_center(renderer, cstr , font, int(SCREEN_WIDTH/2 + PADDING_LEFT + 230), int(SCREEN_HEIGHT/2) + 135);
+    disp_text_center(renderer, price , font, int(SCREEN_WIDTH/2 + PADDING_LEFT + 100), int(SCREEN_HEIGHT/2) + 135);
+    disp_text_center(renderer, "The red square is where the robot is going next!" , font, int(SCREEN_WIDTH/2 + PADDING_LEFT + 100), int(SCREEN_HEIGHT/2) + 165);
+    // std::cout<<"The total price is: "<<total_price<<'\n';
+    delete [] cstr;
 }
 
 
