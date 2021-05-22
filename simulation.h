@@ -110,6 +110,7 @@ public:
 	void checkbombTimeEat();
 	void updatebombTime(Player & p, MazeCell & m);
 	std::vector<int> TSP_Dynamic_Prog( int n, int *price , std::vector<std::vector<int> > cost);
+	std::vector<int> CCTSP_Heuristic( int n, int *v , std::vector<std::vector<int> > cost , int * mapping );
 	void calc_path(int n);
 	void loadTexture(char *textName, char *path);
 	void maze_dist_update();
