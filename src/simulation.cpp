@@ -33,7 +33,7 @@ void Simulation::init(SDL_Renderer *arg_renderer, TTF_Font *arg_font )
     maze_dist_update();
     droid.time = 10000;
     droid.final_freeze = false;
-    srand(3);
+    srand(13);
     start_pos = MAZECOLS + 1;
     droid.setPosCenter(start_pos/MAZECOLS,start_pos%MAZECOLS);
     int n = 10;

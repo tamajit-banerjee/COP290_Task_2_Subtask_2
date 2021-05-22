@@ -304,6 +304,18 @@ std::vector<int> Simulation::CCTSP_Heuristic( int n, int *v , std::vector<std::v
 
       //std::cout<<num<<"\n";
         // int start = mapping[cur];
+    price.clear();
+        for(int i=0;i<n;i++){
+            int tot_prize=0;
+            for(int j=0;j<n;j++){
+                if(i!=j){
+                    tot_prize+=(v[j]/cost[i][j]);
+                }else{
+                    tot_prize+=v[j];
+                }
+            }
+            price.push_back(tot_prize);
+        }
 
         std::vector<int> left;
 
@@ -538,7 +550,7 @@ void Simulation::updateDroid(){
         // std::cout<<"musti"<<i_j.first <<" "<<i_j.second<<"\n";
         
         if(path_counter==0 || (i_j.first == droid.dest/MAZECOLS && i_j.second == droid.dest% MAZECOLS )) {
-            sleep(2);
+           // sleep(2);
             ++path_counter;
             path_counter = (path_counter%simulation_path.size());
             droid.dest = simulation_path[path_counter];
